@@ -5,6 +5,7 @@
 
 let gamesData = [];
 let selectedTournamentId = null;
+let editingGameId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     initGames();
@@ -27,6 +28,8 @@ function initGames() {
 async function loadGamesForTournament(tournamentId) {
     const gamesList = document.getElementById('games-list');
     selectedTournamentId = tournamentId;
+    editingGameId = null;
+    resetGameForm();
 
     try {
         gamesList.innerHTML = '<p class="loading">Laddar spel...</p>';
@@ -64,15 +67,15 @@ function renderGames(games) {
                 <div><span>Turnering ID:</span> ${game.tournamentId}</div>
             </div>
             <div class="card-actions">
-                <button class="btn btn-primary" onclick="editGame(${game.id}, ${selectedTournamentId})">Redigera</button>
-                <button class="btn btn-danger" onclick="deleteGame(${game.id}, ${selectedTournamentId})">Ta bort</button>
+                <button class="btn btn-primary" onclick="editGame(${game.id})">Redigera</button>
+                <button class="btn btn-danger" onclick="deleteGame(${game.id})">Ta bort</button>
             </div>
         </div>
     `).join('');
 }
 
 /**
- * Handle game form submission
+ * Handle game form submission (Create or Update)
  */
 async function handleGameFormSubmit(e) {
     e.preventDefault();
@@ -87,35 +90,53 @@ async function handleGameFormSubmit(e) {
     const time = formData.get('time');
 
     const errorElement = document.getElementById('game-form-error');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
 
     try {
         errorElement.textContent = '';
 
+        // Validate that time is in the future
+        const gameTime = new Date(time);
+        const now = new Date();
+
+        if (gameTime <= now) {
+            errorElement.textContent = 'Datum och tid måste vara i framtiden';
+            return;
+        }
+
         // Create game object
         const gameData = {
             title,
-            time: new Date(time).toISOString(),
+            time: gameTime.toISOString(),
             tournamentId: selectedTournamentId
         };
 
-        // Call API
-        const response = await apiClient.createGame(selectedTournamentId, gameData);
+        // Check if we're updating or creating
+        if (editingGameId) {
+            // Update existing game
+            await apiClient.updateGame(selectedTournamentId, editingGameId, gameData);
+            editingGameId = null;
+            submitBtn.textContent = 'Lägg till spel';
+        } else {
+            // Create new game
+            await apiClient.createGame(selectedTournamentId, gameData);
+        }
 
         // Reset form and reload
         e.target.reset();
         await loadGamesForTournament(selectedTournamentId);
 
-        console.log('Game created successfully:', response);
+        console.log('Game saved successfully');
     } catch (error) {
-        console.error('Error creating game:', error);
+        console.error('Error saving game:', error);
         errorElement.textContent = `Fel: ${error.message}`;
     }
 }
 
 /**
- * Edit game (placeholder)
+ * Edit game - populate form with data
  */
-async function editGame(gameId, tournamentId) {
+async function editGame(gameId) {
     const game = gamesData.find(g => g.id === gameId);
     if (!game) return;
 
@@ -123,14 +144,33 @@ async function editGame(gameId, tournamentId) {
     document.getElementById('game-title').value = game.title;
     document.getElementById('game-time').value = new Date(game.time).toISOString().slice(0, 16);
 
-    // TODO: Implement edit functionality
-    alert('Redigering av spel är ännu inte implementerad');
+    // Change button text and set editing state
+    const submitBtn = document.querySelector('#game-form button[type="submit"]');
+    const cancelBtn = document.getElementById('cancel-game-btn');
+    submitBtn.textContent = 'Uppdatera spel';
+    cancelBtn.style.display = 'inline-block';
+    editingGameId = gameId;
+
+    // Scroll to form
+    document.getElementById('game-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+/**
+ * Reset game form
+ */
+function resetGameForm() {
+    document.getElementById('game-form').reset();
+    const submitBtn = document.querySelector('#game-form button[type="submit"]');
+    const cancelBtn = document.getElementById('cancel-game-btn');
+    submitBtn.textContent = 'Lägg till spel';
+    cancelBtn.style.display = 'none';
+    editingGameId = null;
 }
 
 /**
  * Delete game
  */
-async function deleteGame(gameId, tournamentId) {
+async function deleteGame(gameId) {
     if (!confirm('Är du säker på att du vill ta bort detta spel?')) {
         return;
     }
@@ -139,8 +179,8 @@ async function deleteGame(gameId, tournamentId) {
 
     try {
         errorElement.textContent = '';
-        await apiClient.deleteGame(tournamentId, gameId);
-        await loadGamesForTournament(tournamentId);
+        await apiClient.deleteGame(selectedTournamentId, gameId);
+        await loadGamesForTournament(selectedTournamentId);
     } catch (error) {
         console.error('Error deleting game:', error);
         errorElement.textContent = `Fel vid borttagning: ${error.message}`;

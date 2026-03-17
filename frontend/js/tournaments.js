@@ -4,6 +4,7 @@
  */
 
 let tournamentsData = [];
+let editingTournamentId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     initTournaments();
@@ -42,7 +43,7 @@ async function loadTournaments() {
 
     try {
         tournamentsList.innerHTML = '<p class="loading">Laddar turneringar...</p>';
-        
+
         tournamentsData = await apiClient.getTournaments();
 
         if (!tournamentsData || tournamentsData.length === 0) {
@@ -113,7 +114,7 @@ function renderTournaments(tournaments) {
 }
 
 /**
- * Handle tournament form submission
+ * Handle tournament form submission (Create or Update)
  */
 async function handleTournamentFormSubmit(e) {
     e.preventDefault();
@@ -125,36 +126,53 @@ async function handleTournamentFormSubmit(e) {
     const date = formData.get('date');
 
     const errorElement = document.getElementById('tournament-form-error');
+    const submitBtn = e.target.querySelector('button[type="submit"]');
 
     try {
         errorElement.textContent = '';
+
+        // Validate that date is in the future
+        const tournamentDate = new Date(date);
+        const now = new Date();
+
+        if (tournamentDate <= now) {
+            errorElement.textContent = 'Datum och tid måste vara i framtiden';
+            return;
+        }
 
         // Create tournament object
         const tournamentData = {
             title,
             description: description || null,
             maxPlayers,
-            date: new Date(date).toISOString()
+            date: tournamentDate.toISOString()
         };
 
-        // Call API
-        const response = await apiClient.createTournament(tournamentData);
+        // Check if we're updating or creating
+        if (editingTournamentId) {
+            // Update existing tournament
+            await apiClient.updateTournament(editingTournamentId, tournamentData);
+            editingTournamentId = null;
+            submitBtn.textContent = 'Lägg till turnering';
+        } else {
+            // Create new tournament
+            await apiClient.createTournament(tournamentData);
+        }
 
         // Reset form and reload
         e.target.reset();
         await loadTournaments();
         await loadTournamentsForDropdown();
 
-        // Show success (optional)
-        console.log('Tournament created successfully:', response);
+        console.log('Tournament saved successfully');
     } catch (error) {
-        console.error('Error creating tournament:', error);
+        console.error('Error saving tournament:', error);
         errorElement.textContent = `Fel: ${error.message}`;
     }
 }
 
 /**
- * Edit tournament (placeholder)
+ * Edit tournament - populate form with data
  */
 async function editTournament(id) {
     const tournament = tournamentsData.find(t => t.id === id);
@@ -166,8 +184,27 @@ async function editTournament(id) {
     document.getElementById('tournament-maxplayers').value = tournament.maxPlayers;
     document.getElementById('tournament-date').value = new Date(tournament.date).toISOString().slice(0, 16);
 
-    // TODO: Implement edit functionality
-    alert('Redigering av turneringar är ännu inte implementerad');
+    // Change button text and set editing state
+    const submitBtn = document.querySelector('#tournament-form button[type="submit"]');
+    const cancelBtn = document.getElementById('cancel-tournament-btn');
+    submitBtn.textContent = 'Uppdatera turnering';
+    cancelBtn.style.display = 'inline-block';
+    editingTournamentId = id;
+
+    // Scroll to form
+    document.getElementById('tournament-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+/**
+ * Cancel editing
+ */
+function cancelEditTournament() {
+    document.getElementById('tournament-form').reset();
+    const submitBtn = document.querySelector('#tournament-form button[type="submit"]');
+    const cancelBtn = document.getElementById('cancel-tournament-btn');
+    submitBtn.textContent = 'Lägg till turnering';
+    cancelBtn.style.display = 'none';
+    editingTournamentId = null;
 }
 
 /**

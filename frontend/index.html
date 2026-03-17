@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+    <!-- Error Banner -->
+    <div id="error-banner" class="error-banner hidden">
+        <div class="error-banner-content">
+            <span id="error-banner-message"></span>
+            <button class="error-banner-close" onclick="closeErrorBanner()">✕</button>
+        </div>
+    </div>
+
     <!-- Login Section -->
     <div id="login-section" class="section-container">
         <div class="login-form">
@@ -72,7 +80,10 @@
                             <input type="datetime-local" id="tournament-date" name="date" required>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Lägg till turnering</button>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Lägg till turnering</button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelEditTournament()" id="cancel-tournament-btn" style="display:none;">Avbryt</button>
+                    </div>
                     <p id="tournament-form-error" class="error-message"></p>
                 </form>
 
@@ -105,7 +116,10 @@
                                 <input type="datetime-local" id="game-time" name="time" required>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Lägg till spel</button>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Lägg till spel</button>
+                            <button type="button" class="btn btn-secondary" onclick="resetGameForm()" id="cancel-game-btn" style="display:none;">Avbryt</button>
+                        </div>
                         <p id="game-form-error" class="error-message"></p>
                     </form>
 

@@ -1,6 +1,6 @@
 // API Configuration
 const API_CONFIG = {
-    BASE_URL: 'http://localhost:5000/api',
+    BASE_URL: 'http://localhost:5050/api',
     TOKEN_KEY: 'tournament_jwt_token'
 };
 
@@ -86,6 +86,17 @@ class ApiClient {
             return data;
         } catch (error) {
             console.error('API Error:', error);
+
+            // Handle network/connection errors
+            if (error instanceof TypeError) {
+                if (error.message.includes('Failed to fetch')) {
+                    const errorMsg = `⚠️ Databasen är inte tillgänglig. Kontrollera att API-servern körs på http://localhost:5050`;
+                    showErrorBanner(errorMsg);
+                    throw new Error(errorMsg);
+                }
+            }
+
+            // Re-throw with the error message
             throw error;
         }
     }

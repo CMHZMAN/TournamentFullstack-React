@@ -17,11 +17,49 @@
     --transition: all 0.3s ease;
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background-color: var(--gray-100);
-    color: var(--gray-900);
-    line-height: 1.6;
+/* Error Banner */
+.error-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #fee;
+    border-bottom: 3px solid var(--danger-color);
+    padding: 15px 20px;
+    z-index: 1000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.error-banner.hidden {
+    display: none;
+}
+
+.error-banner-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+#error-banner-message {
+    color: var(--danger-color);
+    font-weight: 500;
+    flex: 1;
+}
+
+.error-banner-close {
+    background: none;
+    border: none;
+    color: var(--danger-color);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+}
+
+.error-banner-close:hover {
+    color: #dc2626;
 }
 
 /* Login Styles */
