@@ -12,3 +12,5 @@ Data ska kunna läggas till via ett formulär på webbsidan, och när data har l
 I README.md ska dokumenteras vad applikationen gör, hur man kör projektet
 och vilka teknologier som används. Det ska också finnas en beskrivning av API:et och dess endpoints
 , samt eventuella krav eller beroenden för att köra projektet.
+
+Vi ska använda JWT för att hantera autentisering och auktorisering i vår applikation. Detta innebär att användare måste logga in för att få en token som de sedan kan använda för att göra anrop till API:et.
