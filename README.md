@@ -375,13 +375,18 @@ frontend/
 ### Backend-struktur
 ```
 api/
-├── Controllers/         # API endpoints
-├── Models/             # Data-modeller
-├── Services/           # Business logic
-├── Data/              # EF Core DbContext
-├── DTOs/              # Data Transfer Objects
-├── Migrations/        # Database migrations
-└── Program.cs         # App-konfiguration
+├── Controllers/
+│   ├── TournamentsController.cs
+│   └── GamesController.cs
+├── Models/
+│   ├── Tournament.cs
+│   └── Game.cs
+├── Services/
+│   ├── TournamentService.cs
+│   ├── GameService.cs
+│   └── RateLimitingService.cs
+└── Data/
+    └── TournamentContext.cs
 ```
 
 ---
@@ -423,7 +428,7 @@ Detta projekt är licensierat under MIT License.
 
 ## 👨‍💻 Utvecklare
 
-Skapat av: **Tomas Hertzman**
+Skapat av: **Marcus Hertzman**
 
 ---
 
@@ -560,38 +565,6 @@ Ta bort spel
 4. Fyll i och klicka "Lägg till spel"
 5. Se alla spel för turneringen
 
-## 🏗️ Arkitektur
-
-### Backend-struktur
-```
-api/
-├── Controllers/
-│   ├── TournamentsController.cs
-│   └── GamesController.cs
-├── Models/
-│   ├── Tournament.cs
-│   └── Game.cs
-├── Services/
-│   ├── TournamentService.cs
-│   ├── GameService.cs
-│   └── RateLimitingService.cs
-└── Data/
-    └── TournamentContext.cs
-```
-
-### Frontend-struktur
-```
-frontend/
-├── index.html
-├── css/
-│   └── styles.css
-└── js/
-    ├── app.js
-    ├── auth.js
-    ├── api-client.js
-    ├── tournaments.js
-    └── games.js
-```
 
 ## 🔒 Säkerhet
 
@@ -607,7 +580,7 @@ frontend/
 
 ## 👨‍💻 Autor
 
-Tomas Hertzman
+Marcus Hertzman
 
 ---
 
