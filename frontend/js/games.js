@@ -4,32 +4,15 @@
  */
 
 let gamesData = [];
-let selectedTournamentId = null;
 let editingGameId = null;
-
-document.addEventListener('DOMContentLoaded', () => {
-    initGames();
-});
-
-/**
- * Initialize games module
- */
-function initGames() {
-    const gameForm = document.getElementById('game-form');
-
-    if (gameForm) {
-        gameForm.addEventListener('submit', handleGameFormSubmit);
-    }
-}
 
 /**
  * Load games for a selected tournament
  */
 async function loadGamesForTournament(tournamentId) {
     const gamesList = document.getElementById('games-list');
-    selectedTournamentId = tournamentId;
     editingGameId = null;
-    resetGameForm();
+    hideGameForm();
 
     try {
         gamesList.innerHTML = '<p class="loading">Laddar spel...</p>';
@@ -64,7 +47,6 @@ function renderGames(games) {
             <h3>${escapeHtml(game.title)}</h3>
             <div class="card-info">
                 <div><span>Tid:</span> ${new Date(game.time).toLocaleString('sv-SE')}</div>
-                <div><span>Turnering ID:</span> ${game.tournamentId}</div>
             </div>
             <div class="card-actions">
                 <button class="btn btn-primary" onclick="editGame(${game.id})">Redigera</button>
@@ -72,6 +54,26 @@ function renderGames(games) {
             </div>
         </div>
     `).join('');
+}
+
+/**
+ * Show new game form
+ */
+function showNewGameForm() {
+    document.getElementById('game-form').classList.remove('hidden');
+    document.getElementById('game-form').reset();
+    editingGameId = null;
+    const submitBtn = document.querySelector('#game-form button[type="submit"]');
+    submitBtn.textContent = 'Lägg till spel';
+}
+
+/**
+ * Hide game form
+ */
+function hideGameForm() {
+    document.getElementById('game-form').classList.add('hidden');
+    document.getElementById('game-form').reset();
+    editingGameId = null;
 }
 
 /**
@@ -124,6 +126,7 @@ async function handleGameFormSubmit(e) {
 
         // Reset form and reload
         e.target.reset();
+        hideGameForm();
         await loadGamesForTournament(selectedTournamentId);
 
         console.log('Game saved successfully');
@@ -146,25 +149,12 @@ async function editGame(gameId) {
 
     // Change button text and set editing state
     const submitBtn = document.querySelector('#game-form button[type="submit"]');
-    const cancelBtn = document.getElementById('cancel-game-btn');
     submitBtn.textContent = 'Uppdatera spel';
-    cancelBtn.style.display = 'inline-block';
     editingGameId = gameId;
 
-    // Scroll to form
+    // Show form
+    document.getElementById('game-form').classList.remove('hidden');
     document.getElementById('game-form').scrollIntoView({ behavior: 'smooth' });
-}
-
-/**
- * Reset game form
- */
-function resetGameForm() {
-    document.getElementById('game-form').reset();
-    const submitBtn = document.querySelector('#game-form button[type="submit"]');
-    const cancelBtn = document.getElementById('cancel-game-btn');
-    submitBtn.textContent = 'Lägg till spel';
-    cancelBtn.style.display = 'none';
-    editingGameId = null;
 }
 
 /**

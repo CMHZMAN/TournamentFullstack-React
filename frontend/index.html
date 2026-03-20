@@ -37,6 +37,7 @@
 
     <!-- Main Application Section -->
     <div id="app-section" class="section-container hidden">
+        <!-- Header -->
         <header class="header">
             <div class="header-content">
                 <h1>Tournament Manager</h1>
@@ -47,88 +48,147 @@
             </div>
         </header>
 
-        <main class="main-content">
-            <!-- Tab Navigation -->
-            <div class="tabs">
-                <button class="tab-btn active" data-tab="tournaments">Turneringar</button>
-                <button class="tab-btn" data-tab="games">Spel</button>
-            </div>
+        <!-- Main Layout -->
+        <div class="app-layout">
+            <!-- Left Sidebar - Tournaments List -->
+            <aside class="tournaments-sidebar">
+                <div class="sidebar-header">
+                    <h2>Turneringar</h2>
+                    <button class="btn btn-primary btn-small" onclick="showNewTournamentForm()">+ Ny</button>
+                </div>
 
-            <!-- Tournaments Tab -->
-            <section id="tournaments-tab" class="tab-content active">
-                <h2>Turneringar</h2>
-                
-                <form id="tournament-form" class="tournament-form">
+                <!-- New Tournament Form -->
+                <form id="tournament-form" class="tournament-form-sidebar hidden">
                     <h3>Lägg till ny turnering</h3>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="tournament-title">Namn:</label>
-                            <input type="text" id="tournament-title" name="title" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="tournament-description">Beskrivning:</label>
-                            <input type="text" id="tournament-description" name="description">
-                        </div>
+                    <div class="form-group">
+                        <label for="tournament-title">Namn:</label>
+                        <input type="text" id="tournament-title" name="title" required>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="tournament-maxplayers">Max spelare:</label>
-                            <input type="number" id="tournament-maxplayers" name="maxPlayers" min="2" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="tournament-date">Datum:</label>
-                            <input type="datetime-local" id="tournament-date" name="date" required>
-                        </div>
+                    <div class="form-group">
+                        <label for="tournament-description">Beskrivning:</label>
+                        <input type="text" id="tournament-description" name="description">
+                    </div>
+                    <div class="form-group">
+                        <label for="tournament-maxplayers">Max spelare:</label>
+                        <input type="number" id="tournament-maxplayers" name="maxPlayers" min="2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="tournament-date">Datum:</label>
+                        <input type="datetime-local" id="tournament-date" name="date" required>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Lägg till turnering</button>
-                        <button type="button" class="btn btn-secondary" onclick="cancelEditTournament()" id="cancel-tournament-btn" style="display:none;">Avbryt</button>
+                        <button type="submit" class="btn btn-primary">Spara</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideTournamentForm()">Avbryt</button>
                     </div>
                     <p id="tournament-form-error" class="error-message"></p>
                 </form>
 
-                <div id="tournaments-list" class="tournaments-list">
+                <!-- Tournaments List -->
+                <div id="tournaments-list" class="tournaments-list-sidebar">
                     <p class="loading">Laddar turneringar...</p>
                 </div>
-            </section>
+            </aside>
 
-            <!-- Games Tab -->
-            <section id="games-tab" class="tab-content hidden">
-                <h2>Spel</h2>
-                
-                <div class="games-container">
-                    <div id="select-tournament" class="tournament-selector">
-                        <label for="game-tournament-select">Välj turnering:</label>
-                        <select id="game-tournament-select">
-                            <option value="">-- Välj turnering --</option>
-                        </select>
-                    </div>
-
-                    <form id="game-form" class="game-form hidden">
-                        <h3>Lägg till nytt spel</h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="game-title">Spel namn:</label>
-                                <input type="text" id="game-title" name="title" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="game-time">Tid:</label>
-                                <input type="datetime-local" id="game-time" name="time" required>
-                            </div>
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">Lägg till spel</button>
-                            <button type="button" class="btn btn-secondary" onclick="resetGameForm()" id="cancel-game-btn" style="display:none;">Avbryt</button>
-                        </div>
-                        <p id="game-form-error" class="error-message"></p>
-                    </form>
-
-                    <div id="games-list" class="games-list">
-                        <p class="loading">Välj en turnering för att se spel</p>
-                    </div>
+            <!-- Right Main Content - Tournament Details & Games -->
+            <main class="tournament-details">
+                <!-- No Tournament Selected -->
+                <div id="no-tournament-selected" class="no-selection">
+                    <p>Välj en turnering från listan för att se och hantera spel</p>
                 </div>
-            </section>
-        </main>
+
+                <!-- Tournament Details -->
+                <div id="tournament-details-view" class="tournament-details-view hidden">
+                    <div class="tournament-header">
+                        <div class="tournament-info">
+                            <h2 id="details-tournament-title"></h2>
+                            <p id="details-tournament-description"></p>
+                        </div>
+                        <div class="tournament-actions">
+                            <button class="btn btn-primary" onclick="showEditTournamentForm()">Redigera</button>
+                            <button class="btn btn-danger" onclick="deleteCurrentTournament()">Ta bort</button>
+                        </div>
+                    </div>
+
+                    <div class="tournament-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Max spelare:</span>
+                            <span id="details-tournament-maxplayers"></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Datum:</span>
+                            <span id="details-tournament-date"></span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Antal spel:</span>
+                            <span id="details-tournament-gamecount"></span>
+                        </div>
+                    </div>
+
+                    <!-- Games Section -->
+                    <section class="games-section">
+                        <div class="games-header">
+                            <h3>Spel i turneringen</h3>
+                            <button class="btn btn-primary btn-small" onclick="showNewGameForm()">+ Lägg till spel</button>
+                        </div>
+
+                        <!-- New Game Form -->
+                        <form id="game-form" class="game-form-inline hidden">
+                            <h4>Lägg till nytt spel</h4>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="game-title">Spel namn:</label>
+                                    <input type="text" id="game-title" name="title" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="game-time">Tid:</label>
+                                    <input type="datetime-local" id="game-time" name="time" required>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Spara</button>
+                                <button type="button" class="btn btn-secondary" onclick="hideGameForm()">Avbryt</button>
+                            </div>
+                            <p id="game-form-error" class="error-message"></p>
+                        </form>
+
+                        <!-- Games List -->
+                        <div id="games-list" class="games-list-details">
+                            <p class="loading">Laddar spel...</p>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Edit Tournament Form -->
+                <form id="tournament-edit-form" class="tournament-form-inline hidden">
+                    <h3>Redigera turnering</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tournament-title-edit">Namn:</label>
+                            <input type="text" id="tournament-title-edit" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tournament-description-edit">Beskrivning:</label>
+                            <input type="text" id="tournament-description-edit" name="description">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="tournament-maxplayers-edit">Max spelare:</label>
+                            <input type="number" id="tournament-maxplayers-edit" name="maxPlayers" min="2" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="tournament-date-edit">Datum:</label>
+                            <input type="datetime-local" id="tournament-date-edit" name="date" required>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Uppdatera</button>
+                        <button type="button" class="btn btn-secondary" onclick="hideEditTournamentForm()">Avbryt</button>
+                    </div>
+                    <p id="tournament-edit-form-error" class="error-message"></p>
+                </form>
+            </main>
+        </div>
     </div>
 
     <script src="js/api-client.js"></script>

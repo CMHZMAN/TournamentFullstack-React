@@ -4,6 +4,7 @@
  */
 
 let tournamentsData = [];
+let selectedTournamentId = null;
 let editingTournamentId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,24 +16,23 @@ document.addEventListener('DOMContentLoaded', () => {
  */
 function initTournaments() {
     const tournamentForm = document.getElementById('tournament-form');
-    const gamesForm = document.getElementById('game-form');
+    const tournamentEditForm = document.getElementById('tournament-edit-form');
+    const gameForm = document.getElementById('game-form');
 
     if (tournamentForm) {
         tournamentForm.addEventListener('submit', handleTournamentFormSubmit);
     }
 
-    // Load tournaments when tab is clicked
-    const tournamentTabBtn = document.querySelector('[data-tab="tournaments"]');
-    if (tournamentTabBtn) {
-        tournamentTabBtn.addEventListener('click', loadTournaments);
+    if (tournamentEditForm) {
+        tournamentEditForm.addEventListener('submit', handleTournamentEditFormSubmit);
     }
 
-    // Populate tournament dropdown for games tab
-    const gamesTournamentSelect = document.getElementById('game-tournament-select');
-    if (gamesTournamentSelect) {
-        gamesTournamentSelect.addEventListener('change', handleTournamentSelect);
-        loadTournamentsForDropdown();
+    if (gameForm) {
+        gameForm.addEventListener('submit', handleGameFormSubmit);
     }
+
+    // Load tournaments on app start
+    loadTournaments();
 }
 
 /**
@@ -51,7 +51,7 @@ async function loadTournaments() {
             return;
         }
 
-        renderTournaments(tournamentsData);
+        renderTournamentsSidebar(tournamentsData);
     } catch (error) {
         console.error('Error loading tournaments:', error);
         tournamentsList.innerHTML = `<p class="loading">Fel vid hämtning av turneringar: ${error.message}</p>`;
@@ -59,36 +59,9 @@ async function loadTournaments() {
 }
 
 /**
- * Load tournaments for the dropdown (games tab)
+ * Render tournaments list in sidebar
  */
-async function loadTournamentsForDropdown() {
-    const select = document.getElementById('game-tournament-select');
-
-    try {
-        const tournaments = await apiClient.getTournaments();
-        tournamentsData = tournaments;
-
-        // Clear existing options except the default one
-        while (select.options.length > 1) {
-            select.remove(1);
-        }
-
-        // Add tournaments to dropdown
-        tournaments.forEach(tournament => {
-            const option = document.createElement('option');
-            option.value = tournament.id;
-            option.textContent = `${tournament.title} (${new Date(tournament.date).toLocaleDateString('sv-SE')})`;
-            select.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error loading tournaments for dropdown:', error);
-    }
-}
-
-/**
- * Render tournaments list
- */
-function renderTournaments(tournaments) {
+function renderTournamentsSidebar(tournaments) {
     const tournamentsList = document.getElementById('tournaments-list');
 
     if (!tournaments || tournaments.length === 0) {
@@ -97,24 +70,118 @@ function renderTournaments(tournaments) {
     }
 
     tournamentsList.innerHTML = tournaments.map(tournament => `
-        <div class="tournament-card">
+        <div class="tournament-card-sidebar ${selectedTournamentId === tournament.id ? 'active' : ''}" onclick="selectTournament(${tournament.id})">
             <h3>${escapeHtml(tournament.title)}</h3>
-            <div class="card-info">
-                <div><span>Beskrivning:</span> ${escapeHtml(tournament.description || 'N/A')}</div>
-                <div><span>Max spelare:</span> ${tournament.maxPlayers}</div>
-                <div><span>Datum:</span> ${new Date(tournament.date).toLocaleDateString('sv-SE')}</div>
-                <div><span>Spel:</span> ${tournament.games?.length || 0}</div>
-            </div>
-            <div class="card-actions">
-                <button class="btn btn-primary" onclick="editTournament(${tournament.id})">Redigera</button>
-                <button class="btn btn-danger" onclick="deleteTournament(${tournament.id})">Ta bort</button>
+            <div class="tournament-card-sidebar-info">
+                <div>${escapeHtml(tournament.description || 'Ingen beskrivning')}</div>
+                <div>${new Date(tournament.date).toLocaleDateString('sv-SE')}</div>
+                <div>${tournament.games?.length || 0} spel</div>
             </div>
         </div>
     `).join('');
 }
 
 /**
- * Handle tournament form submission (Create or Update)
+ * Select a tournament and show its details
+ */
+async function selectTournament(tournamentId) {
+    selectedTournamentId = tournamentId;
+    const tournament = tournamentsData.find(t => t.id === tournamentId);
+
+    if (!tournament) return;
+
+    // Hide forms
+    hideTournamentForm();
+    hideEditTournamentForm();
+    hideGameForm();
+
+    // Update sidebar highlighting
+    document.querySelectorAll('.tournament-card-sidebar').forEach(card => {
+        card.classList.remove('active');
+    });
+    event.currentTarget.classList.add('active');
+
+    // Show tournament details
+    showTournamentDetails(tournament);
+}
+
+/**
+ * Show tournament details
+ */
+function showTournamentDetails(tournament) {
+    const detailsView = document.getElementById('tournament-details-view');
+    const noSelection = document.getElementById('no-tournament-selected');
+
+    // Hide no selection message
+    noSelection.classList.add('hidden');
+    detailsView.classList.remove('hidden');
+
+    // Update tournament info
+    document.getElementById('details-tournament-title').textContent = tournament.title;
+    document.getElementById('details-tournament-description').textContent = tournament.description || 'Ingen beskrivning';
+    document.getElementById('details-tournament-maxplayers').textContent = tournament.maxPlayers;
+    document.getElementById('details-tournament-date').textContent = new Date(tournament.date).toLocaleDateString('sv-SE');
+    document.getElementById('details-tournament-gamecount').textContent = tournament.games?.length || 0;
+
+    // Load games for this tournament
+    loadGamesForTournament(tournament.id);
+}
+
+/**
+ * Show new tournament form
+ */
+function showNewTournamentForm() {
+    document.getElementById('tournament-form').classList.remove('hidden');
+    document.getElementById('tournament-form').reset();
+}
+
+/**
+ * Hide tournament form
+ */
+function hideTournamentForm() {
+    document.getElementById('tournament-form').classList.add('hidden');
+    document.getElementById('tournament-form').reset();
+}
+
+/**
+ * Show edit tournament form
+ */
+function showEditTournamentForm() {
+    if (!selectedTournamentId) return;
+
+    const tournament = tournamentsData.find(t => t.id === selectedTournamentId);
+    if (!tournament) return;
+
+    // Fill edit form
+    document.getElementById('tournament-title-edit').value = tournament.title;
+    document.getElementById('tournament-description-edit').value = tournament.description || '';
+    document.getElementById('tournament-maxplayers-edit').value = tournament.maxPlayers;
+    document.getElementById('tournament-date-edit').value = new Date(tournament.date).toISOString().slice(0, 16);
+
+    // Show form
+    editingTournamentId = selectedTournamentId;
+    document.getElementById('tournament-edit-form').classList.remove('hidden');
+    document.getElementById('tournament-details-view').classList.add('hidden');
+}
+
+/**
+ * Hide edit tournament form
+ */
+function hideEditTournamentForm() {
+    document.getElementById('tournament-edit-form').classList.add('hidden');
+    document.getElementById('tournament-edit-form').reset();
+    editingTournamentId = null;
+
+    if (selectedTournamentId) {
+        const tournament = tournamentsData.find(t => t.id === selectedTournamentId);
+        if (tournament) {
+            showTournamentDetails(tournament);
+        }
+    }
+}
+
+/**
+ * Handle new tournament form submission
  */
 async function handleTournamentFormSubmit(e) {
     e.preventDefault();
@@ -126,7 +193,6 @@ async function handleTournamentFormSubmit(e) {
     const date = formData.get('date');
 
     const errorElement = document.getElementById('tournament-form-error');
-    const submitBtn = e.target.querySelector('button[type="submit"]');
 
     try {
         errorElement.textContent = '';
@@ -148,101 +214,100 @@ async function handleTournamentFormSubmit(e) {
             date: tournamentDate.toISOString()
         };
 
-        // Check if we're updating or creating
-        if (editingTournamentId) {
-            // Update existing tournament
-            await apiClient.updateTournament(editingTournamentId, tournamentData);
-            editingTournamentId = null;
-            submitBtn.textContent = 'Lägg till turnering';
-        } else {
-            // Create new tournament
-            await apiClient.createTournament(tournamentData);
-        }
+        // Call API
+        await apiClient.createTournament(tournamentData);
 
-        // Reset form and reload
+        // Reset and reload
         e.target.reset();
+        hideTournamentForm();
         await loadTournaments();
-        await loadTournamentsForDropdown();
-
-        console.log('Tournament saved successfully');
     } catch (error) {
-        console.error('Error saving tournament:', error);
+        console.error('Error creating tournament:', error);
         errorElement.textContent = `Fel: ${error.message}`;
     }
 }
 
 /**
- * Edit tournament - populate form with data
+ * Handle edit tournament form submission
  */
-async function editTournament(id) {
-    const tournament = tournamentsData.find(t => t.id === id);
-    if (!tournament) return;
+async function handleTournamentEditFormSubmit(e) {
+    e.preventDefault();
 
-    // Fill form with tournament data
-    document.getElementById('tournament-title').value = tournament.title;
-    document.getElementById('tournament-description').value = tournament.description || '';
-    document.getElementById('tournament-maxplayers').value = tournament.maxPlayers;
-    document.getElementById('tournament-date').value = new Date(tournament.date).toISOString().slice(0, 16);
+    if (!editingTournamentId) return;
 
-    // Change button text and set editing state
-    const submitBtn = document.querySelector('#tournament-form button[type="submit"]');
-    const cancelBtn = document.getElementById('cancel-tournament-btn');
-    submitBtn.textContent = 'Uppdatera turnering';
-    cancelBtn.style.display = 'inline-block';
-    editingTournamentId = id;
+    const formData = new FormData(e.target);
+    const title = formData.get('title');
+    const description = formData.get('description');
+    const maxPlayers = parseInt(formData.get('maxPlayers'));
+    const date = formData.get('date');
 
-    // Scroll to form
-    document.getElementById('tournament-form').scrollIntoView({ behavior: 'smooth' });
-}
-
-/**
- * Cancel editing
- */
-function cancelEditTournament() {
-    document.getElementById('tournament-form').reset();
-    const submitBtn = document.querySelector('#tournament-form button[type="submit"]');
-    const cancelBtn = document.getElementById('cancel-tournament-btn');
-    submitBtn.textContent = 'Lägg till turnering';
-    cancelBtn.style.display = 'none';
-    editingTournamentId = null;
-}
-
-/**
- * Delete tournament
- */
-async function deleteTournament(id) {
-    if (!confirm('Är du säker på att du vill ta bort denna turnering?')) {
-        return;
-    }
-
-    const errorElement = document.getElementById('tournament-form-error');
+    const errorElement = document.getElementById('tournament-edit-form-error');
 
     try {
         errorElement.textContent = '';
-        await apiClient.deleteTournament(id);
+
+        // Validate that date is in the future
+        const tournamentDate = new Date(date);
+        const now = new Date();
+
+        if (tournamentDate <= now) {
+            errorElement.textContent = 'Datum och tid måste vara i framtiden';
+            return;
+        }
+
+        // Create tournament object
+        const tournamentData = {
+            title,
+            description: description || null,
+            maxPlayers,
+            date: tournamentDate.toISOString()
+        };
+
+        // Call API
+        await apiClient.updateTournament(editingTournamentId, tournamentData);
+
+        // Save the ID before resetting
+        const updatedId = editingTournamentId;
+
+        // Reset and reload
+        editingTournamentId = null;
         await loadTournaments();
-        await loadTournamentsForDropdown();
+
+        // Re-select the tournament to show updated details
+        const updatedTournament = tournamentsData.find(t => t.id === updatedId);
+        if (updatedTournament) {
+            selectTournament(updatedId);
+        } else {
+            hideEditTournamentForm();
+        }
     } catch (error) {
-        console.error('Error deleting tournament:', error);
-        errorElement.textContent = `Fel vid borttagning: ${error.message}`;
+        console.error('Error updating tournament:', error);
+        errorElement.textContent = `Fel: ${error.message}`;
     }
 }
 
 /**
- * Handle tournament selection in games tab
+ * Delete current tournament
  */
-async function handleTournamentSelect(e) {
-    const tournamentId = e.target.value;
-    const gameForm = document.getElementById('game-form');
+async function deleteCurrentTournament() {
+    if (!selectedTournamentId) return;
 
-    if (!tournamentId) {
-        gameForm.classList.add('hidden');
-        document.getElementById('games-list').innerHTML = '<p class="loading">Välj en turnering för att se spel</p>';
+    if (!confirm('Är du säker på att du vill ta bort denna turnering och alla dess spel?')) {
         return;
     }
 
-    gameForm.classList.remove('hidden');
-    await loadGamesForTournament(tournamentId);
+    try {
+        await apiClient.deleteTournament(selectedTournamentId);
+        selectedTournamentId = null;
+        await loadTournaments();
+
+        // Hide details
+        document.getElementById('tournament-details-view').classList.add('hidden');
+        document.getElementById('no-tournament-selected').classList.remove('hidden');
+    } catch (error) {
+        console.error('Error deleting tournament:', error);
+        showErrorBanner(`Fel vid borttagning: ${error.message}`);
+    }
 }
 
 /**
