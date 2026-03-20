@@ -51,6 +51,17 @@ async function loadTournaments() {
             return;
         }
 
+        // Load game count for each tournament
+        for (let tournament of tournamentsData) {
+            try {
+                const games = await apiClient.getGames(tournament.id);
+                tournament.gameCount = games ? games.length : 0;
+            } catch (error) {
+                console.warn(`Could not load games for tournament ${tournament.id}:`, error);
+                tournament.gameCount = 0;
+            }
+        }
+
         renderTournamentsSidebar(tournamentsData);
     } catch (error) {
         console.error('Error loading tournaments:', error);
@@ -69,16 +80,20 @@ function renderTournamentsSidebar(tournaments) {
         return;
     }
 
-    tournamentsList.innerHTML = tournaments.map(tournament => `
+    tournamentsList.innerHTML = tournaments.map(tournament => {
+        // Use gameCount if available, otherwise show 0
+        const gameCount = tournament.gameCount !== undefined ? tournament.gameCount : 0;
+        return `
         <div class="tournament-card-sidebar ${selectedTournamentId === tournament.id ? 'active' : ''}" onclick="selectTournament(${tournament.id})">
             <h3>${escapeHtml(tournament.title)}</h3>
             <div class="tournament-card-sidebar-info">
                 <div>${escapeHtml(tournament.description || 'Ingen beskrivning')}</div>
                 <div>${new Date(tournament.date).toLocaleDateString('sv-SE')}</div>
-                <div>${tournament.games?.length || 0} spel</div>
+                <div>${gameCount} spel</div>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 /**
@@ -121,9 +136,12 @@ function showTournamentDetails(tournament) {
     document.getElementById('details-tournament-description').textContent = tournament.description || 'Ingen beskrivning';
     document.getElementById('details-tournament-maxplayers').textContent = tournament.maxPlayers;
     document.getElementById('details-tournament-date').textContent = new Date(tournament.date).toLocaleDateString('sv-SE');
-    document.getElementById('details-tournament-gamecount').textContent = tournament.games?.length || 0;
 
-    // Load games for this tournament
+    // Use the game count we loaded, or show 0 as placeholder
+    const gameCountElement = document.getElementById('details-tournament-gamecount');
+    gameCountElement.textContent = tournament.gameCount !== undefined ? tournament.gameCount : '...';
+
+    // Load games for this tournament and update the count
     loadGamesForTournament(tournament.id);
 }
 

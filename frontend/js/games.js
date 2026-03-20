@@ -21,10 +21,21 @@ async function loadGamesForTournament(tournamentId) {
 
         if (!gamesData || gamesData.length === 0) {
             gamesList.innerHTML = '<p class="loading">Inga spel hittades för denna turnering</p>';
-            return;
+        } else {
+            renderGames(gamesData);
         }
 
-        renderGames(gamesData);
+        // Update the game count in the details view
+        const gameCountElement = document.getElementById('details-tournament-gamecount');
+        if (gameCountElement) {
+            gameCountElement.textContent = gamesData ? gamesData.length : 0;
+        }
+
+        // Update the game count in the sidebar
+        const tournament = tournamentsData.find(t => t.id === tournamentId);
+        if (tournament) {
+            tournament.gameCount = gamesData ? gamesData.length : 0;
+        }
     } catch (error) {
         console.error('Error loading games:', error);
         gamesList.innerHTML = `<p class="loading">Fel vid hämtning av spel: ${error.message}</p>`;

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital@0;1&display=swap');
+
 * {
     margin: 0;
     padding: 0;
@@ -5,16 +7,52 @@
 }
 
 :root {
-    --primary-color: #2563eb;
-    --secondary-color: #10b981;
-    --danger-color: #ef4444;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-300: #d1d5db;
-    --gray-700: #374151;
-    --gray-900: #111827;
+    --primary-color: #8B4513;
+    --secondary-color: #D4A574;
+    --danger-color: #C41E3A;
+    --gray-100: #2a2a2a;
+    --gray-200: #3a3a3a;
+    --gray-300: #4a4a4a;
+    --gray-700: #c0c0c0;
+    --gray-900: #f5f5f5;
     --border-radius: 8px;
     --transition: all 0.3s ease;
+}
+
+body {
+    font-family: 'Crimson Text', serif;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d1810 50%, #1a1a1a 100%);
+    background-attachment: fixed;
+    color: var(--gray-900);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* Stone texture overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.1) 2px,
+            rgba(0, 0, 0, 0.1) 4px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 0, 0, 0.1) 2px,
+            rgba(0, 0, 0, 0.1) 4px
+        );
+    pointer-events: none;
+    z-index: -1;
 }
 
 /* Error Banner */
@@ -69,6 +107,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 20px;
 }
 
 .section-container.hidden {
@@ -76,25 +115,54 @@
 }
 
 .login-form {
-    background: white;
-    padding: 40px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    padding: 50px 40px;
+    border-radius: 12px;
+    border: 2px solid var(--secondary-color);
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.8),
+        inset 0 0 20px rgba(212, 165, 116, 0.1);
     width: 100%;
-    max-width: 400px;
+    max-width: 420px;
+    position: relative;
+}
+
+.login-form::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+}
+
+.login-form::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
 }
 
 .login-form h1 {
     text-align: center;
     margin-bottom: 10px;
-    color: var(--primary-color);
+    color: var(--secondary-color);
+    font-family: 'Cinzel', serif;
+    font-size: 32px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: 1px;
 }
 
 .login-form > p {
     text-align: center;
     color: var(--gray-700);
     margin-bottom: 30px;
-    font-size: 14px;
+    font-size: 15px;
+    letter-spacing: 0.5px;
 }
 
 /* Form Styles */
@@ -106,7 +174,7 @@
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: var(--gray-900);
+    color: var(--secondary-color);
 }
 
 .form-group input,
@@ -117,13 +185,15 @@
     border-radius: var(--border-radius);
     font-size: 14px;
     transition: var(--transition);
+    background-color: var(--gray-200);
+    color: var(--gray-900);
 }
 
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.2);
 }
 
 .form-row {
@@ -151,11 +221,13 @@
 
 .btn-primary {
     background-color: var(--primary-color);
-    color: white;
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
 }
 
 .btn-primary:hover {
-    background-color: #1d4ed8;
+    background-color: #A0522D;
+    box-shadow: 0 0 8px rgba(212, 165, 116, 0.4);
 }
 
 .btn-secondary {
@@ -169,20 +241,22 @@
 
 .btn-danger {
     background-color: var(--danger-color);
-    color: white;
+    color: var(--gray-900);
+    border: 1px solid #8B0000;
 }
 
 .btn-danger:hover {
-    background-color: #dc2626;
+    background-color: #8B0000;
+    color: var(--secondary-color);
 }
 
 .btn-success {
     background-color: var(--secondary-color);
-    color: white;
+    color: var(--gray-900);
 }
 
 .btn-success:hover {
-    background-color: #059669;
+    background-color: #CD853F;
 }
 
 /* Layout */
@@ -194,11 +268,11 @@
 
 .tournaments-sidebar {
     width: 300px;
-    background: white;
-    border-right: 1px solid var(--gray-300);
+    background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+    border-right: 2px solid var(--secondary-color);
     overflow-y: auto;
     padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     order: -1;
 }
 
@@ -218,13 +292,14 @@
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 2px solid var(--gray-300);
+    border-bottom: 2px solid var(--secondary-color);
 }
 
 .sidebar-header h2 {
     margin: 0;
-    font-size: 18px;
-    color: var(--gray-900);
+    font-size: 20px;
+    color: var(--secondary-color);
+    font-family: 'Cinzel', serif;
 }
 
 .btn-small {
@@ -240,7 +315,7 @@
 }
 
 .tournament-card-sidebar {
-    background: white;
+    background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
     border: 2px solid var(--gray-300);
     border-radius: var(--border-radius);
     padding: 15px;
@@ -249,23 +324,26 @@
 }
 
 .tournament-card-sidebar:hover {
-    border-color: var(--primary-color);
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.15);
+    border-color: var(--secondary-color);
+    box-shadow: 0 2px 8px rgba(212, 165, 116, 0.3);
 }
 
 .tournament-card-sidebar.active {
-    background: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
+    background: linear-gradient(135deg, #8B4513 0%, #654321 100%);
+    color: var(--gray-900);
+    border-color: var(--secondary-color);
+    box-shadow: 0 2px 8px rgba(212, 165, 116, 0.5);
 }
 
 .tournament-card-sidebar h3 {
     margin: 0 0 5px 0;
     font-size: 14px;
+    color: var(--secondary-color);
+    font-family: 'Cinzel', serif;
 }
 
 .tournament-card-sidebar.active h3 {
-    color: white;
+    color: var(--gray-900);
 }
 
 .tournament-card-sidebar-info {
@@ -274,21 +352,22 @@
 }
 
 .tournament-card-sidebar.active .tournament-card-sidebar-info {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--gray-900);
 }
 
 /* No Selection Message - Fixed Header */
 .no-selection {
     position: sticky;
     top: 0;
-    background: var(--gray-100);
+    background: linear-gradient(135deg, #2d1810 0%, #1a0a00 100%);
     padding: 30px;
-    border-bottom: 2px solid var(--gray-300);
-    color: var(--gray-700);
-    font-size: 16px;
+    border-bottom: 2px solid var(--secondary-color);
+    color: var(--secondary-color);
+    font-size: 18px;
     text-align: center;
     z-index: 50;
     flex-shrink: 0;
+    font-family: 'Cinzel', serif;
 }
 
 .no-selection.hidden {
@@ -321,7 +400,8 @@
 .tournament-info h2 {
     margin: 0 0 10px 0;
     font-size: 32px;
-    color: var(--gray-900);
+    color: var(--secondary-color);
+    font-family: 'Cinzel', serif;
 }
 
 .tournament-info p {
@@ -342,8 +422,9 @@
     gap: 20px;
     margin-bottom: 30px;
     padding: 20px;
-    background: var(--gray-100);
+    background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
     border-radius: var(--border-radius);
+    border: 1px solid var(--secondary-color);
 }
 
 .meta-item {
@@ -354,9 +435,10 @@
 
 .meta-label {
     font-weight: 500;
-    color: var(--gray-700);
+    color: var(--secondary-color);
     font-size: 12px;
     text-transform: uppercase;
+    font-family: 'Cinzel', serif;
 }
 
 .meta-item span:last-child {
@@ -380,6 +462,8 @@
 .games-header h3 {
     margin: 0;
     font-size: 20px;
+    color: var(--secondary-color);
+    font-family: 'Cinzel', serif;
 }
 
 .games-list-details {
@@ -392,10 +476,11 @@
 .tournament-form-sidebar,
 .tournament-form-inline,
 .game-form-inline {
-    background: var(--gray-100);
+    background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
     padding: 20px;
     border-radius: var(--border-radius);
     margin-bottom: 20px;
+    border: 1px solid var(--secondary-color);
 }
 
 .tournament-form-sidebar.hidden,
@@ -409,10 +494,12 @@
 .game-form-inline h4 {
     margin-top: 0;
     margin-bottom: 15px;
+    color: var(--secondary-color);
+    font-family: 'Cinzel', serif;
 }
 
 .tournament-form-sidebar h3 {
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .tournament-form-inline h3,
@@ -438,10 +525,11 @@
     left: 0;
     right: 0;
     z-index: 100;
-    background-color: var(--primary-color);
-    color: white;
+    background: linear-gradient(135deg, #1a0a00 0%, #3d2414 100%);
+    color: var(--secondary-color);
     padding: 15px 0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    border-bottom: 3px solid var(--secondary-color);
 }
 
 .header-content {
@@ -455,8 +543,11 @@
 }
 
 .header h1 {
-    font-size: 24px;
+    font-family: 'Cinzel', serif;
+    font-size: 28px;
     margin: 0;
+    color: var(--secondary-color);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .user-info {
@@ -467,7 +558,7 @@
 
 #current-user {
     font-size: 14px;
-    color: white;
+    color: var(--secondary-color);
 }
 
 #logout-btn {
@@ -485,22 +576,25 @@
 
 .tournament-card,
 .game-card {
-    background: white;
+    background: linear-gradient(135deg, #3a3a3a 0%, #2a2a2a 100%);
     border-radius: var(--border-radius);
     padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     transition: var(--transition);
+    border: 1px solid var(--gray-300);
 }
 
 .tournament-card:hover,
 .game-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(212, 165, 116, 0.2);
+    border-color: var(--secondary-color);
 }
 
 .tournament-card h3,
 .game-card h3 {
     margin-bottom: 10px;
-    color: var(--primary-color);
+    color: var(--secondary-color);
+    font-family: 'Cinzel', serif;
 }
 
 .card-info {

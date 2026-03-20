@@ -1,79 +1,107 @@
-# Tournament Manager - Fullstack Application
+# ⚔️ Tournament Manager - Fullstack Application
 
-En modernt webbapplikation för att hantera turneringar och spel med JWT-baserad autentisering.
+En medeltida-inspirerad fullstack-webbapplikation för att hantera turneringar och spel med JWT-baserad autentisering.
 
 ## 📋 Innehålsförteckning
 
-- [Översikt](#översikt)
+- [Vad är Tournament Manager?](#vad-är-tournament-manager)
 - [Funktionalitet](#funktionalitet)
 - [Teknikstack](#teknikstack)
-- [Installation](#installation)
-- [Konfiguration](#konfiguration)
-- [API-dokumentation](#api-dokumentation)
+- [Krav](#krav)
+- [Installation & Setup](#installation--setup)
 - [Användning](#användning)
+- [API-dokumentation](#api-dokumentation)
 - [Arkitektur](#arkitektur)
+- [Felsökning](#felsökning)
 
-## 🎯 Översikt
+## 🎯 Vad är Tournament Manager?
 
-Tournament Manager är en fullstack-applikation som gör det möjligt för användare att:
-- Skapa, läsa, uppdatera och ta bort turneringar
-- Hantera spel inom turneringar
-- Logga in med JWT-autentisering
-- Få realtidsuppdateringar av data
+**Tournament Manager** är en fullstack-webbapplikation designad för att hantera turneringar och spel på ett enkelt och elegant sätt. Applikationen är inspirerad av medeltida D&D-teman med mörk bakgrund, gyllena accenter och eleganta serif-typsnitt.
+
+Applikationen gör det möjligt för användare att:
+- ✅ **Skapa och hantera turneringar** - Lägg till datum, beskrivning och max antal spelare
+- ✅ **Organisera spel** - Lägg till spel under turneringar med specifika tider
+- ✅ **Redigera och ta bort** - Uppdatera eller ta bort turneringar och spel när som helst
+- ✅ **Logga in säkert** - JWT-baserad autentisering för säker åtkomst
+- ✅ **Se statistik** - Visa antal spel per turnering i realtid
 
 Applikationen består av:
-- **Backend**: ASP.NET Core REST API
-- **Frontend**: Modern HTML/CSS/JavaScript-applikation
+- **Backend**: ASP.NET Core 10.0 REST API
+- **Frontend**: Modern HTML/CSS/JavaScript med medeltida tema
 - **Databas**: Entity Framework Core med SQL Server
 
 ## ✨ Funktionalitet
 
 ### Autentisering & Säkerhet
 - ✅ JWT-baserad autentisering
-- ✅ Token-baserad auktorisering
+- ✅ Token-baserad auktorisering på alla API-anrop
 - ✅ Automatisk logout vid utgånget token
-- ✅ Rate limiting på API-anrop
+- ✅ CORS-aktiverat för frontend-kommunikation
 
-### Turneringar
-- ✅ **Hämta** alla turneringar med sökning
-- ✅ **Skapa** nya turneringar
+### Turneringar - CRUD operationer
+- ✅ **Hämta** alla turneringar från databasen
+- ✅ **Skapa** nya turneringar med titel, beskrivning, datum och maxantal spelare
 - ✅ **Uppdatera** befintliga turneringar
-- ✅ **Ta bort** turneringar
+- ✅ **Ta bort** turneringar (och alla associerade spel)
 - ✅ Visa antal spel per turnering
+- ✅ Datumvalidering - Endast framtida datum accepteras
 
-### Spel
-- ✅ **Hämta** spel för en turnering
-- ✅ **Skapa** nya spel
+### Spel - CRUD operationer
+- ✅ **Hämta** spel för en specifik turnering
+- ✅ **Skapa** nya spel under en turnering
 - ✅ **Uppdatera** befintliga spel
-- ✅ **Ta bort** spel
-- ✅ Verifiering att spel tillhör rätt turnering
+- ✅ **Ta bort** spel från en turnering
+- ✅ Datumvalidering - Endast framtida datum accepteras
+
+### Använrgränssnitt
+- ✅ **Two-column layout** - Turneringar på vänster, detaljer på höger
+- ✅ **Medeltida tema** - Mörk bakgrund, gyllena accenter, Cinzel-typsnitt
+- ✅ **Error handling** - Tydliga felmeddelanden i error-banner
+- ✅ **Responsive design** - Fungerar på desktop och mobil
 
 ## 🛠️ Teknikstack
 
 ### Backend
-- **Framework**: ASP.NET Core 8.0
+- **Framework**: ASP.NET Core 10.0
+- **Language**: C#
 - **Databas**: SQL Server
-- **ORM**: Entity Framework Core
+- **ORM**: Entity Framework Core 8.0
 - **Autentisering**: JWT (JSON Web Tokens)
-- **Logging**: Microsoft.Extensions.Logging
+- **Kommunikation**: REST API med CORS
 
 ### Frontend
 - **HTML5**: Semantisk struktur
-- **CSS3**: Modern responsive design
+- **CSS3**: Modern responsive design med medeltida tema
 - **JavaScript (ES6+)**: Client-side logik
-- **Fetch API**: API-kommunikation
+- **Fetch API**: Asynkron API-kommunikation
+- **Typsnitt**: Cinzel (rubriker), Crimson Text (brödtext)
 
 ### Utvecklingsverktyg
 - **Version Control**: Git
-- **IDE**: Visual Studio / Visual Studio Code
-- **Runtime**: .NET 8.0
+- **IDE**: Visual Studio Community 2026
+- **Runtime**: .NET 10.0
+- **Terminal**: PowerShell
 
-## 📦 Installation
+## 📋 Krav
+
+### Server-krav
+- **.NET 10.0 SDK** eller senare
+- **SQL Server** 2019 eller senare (eller SQL Server Express/LocalDB)
+- **Port 5050** för API-servern (kan konfigureras)
+
+### Klient-krav
+- Modern webbläsare med stöd för:
+  - ES6+ JavaScript
+  - Fetch API
+  - LocalStorage
+  - CSS Grid & Flexbox
+
+## 🚀 Installation & Setup
 
 ### Förutsättningar
-- .NET 8.0 SDK eller senare
-- SQL Server 2019 eller senare (eller SQL Server Express)
-- En modern webbläsare (Chrome, Firefox, Edge, Safari)
+- Git installerat
+- .NET 10.0 SDK eller senare
+- SQL Server igång och tillgänglig
 
 ### Steg-för-steg Guide
 
@@ -83,25 +111,335 @@ git clone https://github.com/quizzly2k/TournamentFullstack.git
 cd TournamentFullstack
 ```
 
-#### 2. Installera & Konfigurera Backend
+#### 2. Konfigurera Backend
 
+**Gå till API-mappen:**
 ```bash
 cd api
 ```
 
-**Uppdatera databasmigration (om nödvändigt):**
-```bash
-dotnet ef migrations add YourMigrationName
-dotnet ef database update
+**Uppdatera databasanslutningen** i `appsettings.json`:
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Database=TournamentDb;User Id=sa;Password=YourPassword123!;Encrypt=false;TrustServerCertificate=true;"
+  }
+}
 ```
 
-**Starta API-servern:**
+Eller för **LocalDB**:
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=TournamentDb;Trusted_Connection=true;"
+  }
+}
+```
+
+**Installera NuGet-paket och kör API:t:**
 ```bash
+dotnet restore
 dotnet run
 ```
-API:et körs på: `http://localhost:5000`
+
+API:t kommer att starta på: `http://localhost:5050`
 
 #### 3. Öppna Frontend
+
+Öppna `frontend/index.html` i en webbläsare eller serva det via en lokal server:
+
+```bash
+# Med Python 3
+cd ../frontend
+python -m http.server 8000
+
+# Sedan öppna: http://localhost:8000
+```
+
+## 📡 API-dokumentation
+
+### Base URL
+```
+http://localhost:5050/api
+```
+
+### Autentisering
+Alla API-anrop kräver en JWT-token i `Authorization`-headern:
+```
+Authorization: Bearer <your_jwt_token>
+```
+
+### Authentication Endpoints
+
+#### Logga In
+```http
+POST /auth/login
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "password": "password123"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "username": "testuser"
+}
+```
+
+---
+
+### Tournament Endpoints
+
+#### Hämta alla turneringar
+```http
+GET /tournaments
+Authorization: Bearer <token>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "title": "Dragon Slayers Championship",
+    "description": "En episk turnering för hjältar",
+    "maxPlayers": 16,
+    "date": "2024-12-25T14:00:00Z",
+    "gameCount": 5
+  }
+]
+```
+
+#### Skapa ny turnering
+```http
+POST /tournaments
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "Dragon Slayers Championship",
+  "description": "En episk turnering för hjältar",
+  "maxPlayers": 16,
+  "date": "2024-12-25T14:00:00Z"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "title": "Dragon Slayers Championship",
+  "description": "En episk turnering för hjältar",
+  "maxPlayers": 16,
+  "date": "2024-12-25T14:00:00Z"
+}
+```
+
+#### Uppdatera turnering
+```http
+PUT /tournaments/{id}
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "Updated Title",
+  "description": "Updated description",
+  "maxPlayers": 20,
+  "date": "2024-12-25T14:00:00Z"
+}
+```
+
+**Response (200 OK):** Uppdaterad turnering-objekt
+
+#### Ta bort turnering
+```http
+DELETE /tournaments/{id}
+Authorization: Bearer <token>
+```
+
+**Response (204 No Content)**
+
+---
+
+### Game Endpoints
+
+#### Hämta spel för en turnering
+```http
+GET /tournaments/{tournamentId}/games
+Authorization: Bearer <token>
+```
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": 1,
+    "title": "Dungeon Level 1",
+    "time": "2024-12-25T14:00:00Z",
+    "tournamentId": 1
+  }
+]
+```
+
+#### Skapa nytt spel
+```http
+POST /tournaments/{tournamentId}/games
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "Dungeon Level 1",
+  "time": "2024-12-25T14:00:00Z"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": 1,
+  "title": "Dungeon Level 1",
+  "time": "2024-12-25T14:00:00Z",
+  "tournamentId": 1
+}
+```
+
+#### Uppdatera spel
+```http
+PUT /tournaments/{tournamentId}/games/{gameId}
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "Updated Game Title",
+  "time": "2024-12-25T15:00:00Z"
+}
+```
+
+**Response (200 OK):** Uppdaterad spel-objekt
+
+#### Ta bort spel
+```http
+DELETE /tournaments/{tournamentId}/games/{gameId}
+Authorization: Bearer <token>
+```
+
+**Response (204 No Content)**
+
+---
+
+### Error Responses
+
+#### 401 Unauthorized
+```json
+{
+  "error": "Invalid or expired token"
+}
+```
+
+#### 404 Not Found
+```json
+{
+  "error": "Tournament not found"
+}
+```
+
+#### 400 Bad Request
+```json
+{
+  "error": "Validation error - Date must be in the future"
+}
+```
+
+---
+
+## 🏗️ Arkitektur
+
+### Frontend-struktur
+```
+frontend/
+├── index.html           # Huvudsida
+├── css/
+│   └── styles.css       # Medeltida tema & styling
+└── js/
+    ├── api-client.js    # API-kommunikation
+    ├── auth.js          # Autentisering & login
+    ├── tournaments.js   # Turnering CRUD-logik
+    ├── games.js         # Spel CRUD-logik
+    └── app.js           # Huvudapplikations-logik
+```
+
+### Backend-struktur
+```
+api/
+├── Controllers/         # API endpoints
+├── Models/             # Data-modeller
+├── Services/           # Business logic
+├── Data/              # EF Core DbContext
+├── DTOs/              # Data Transfer Objects
+├── Migrations/        # Database migrations
+└── Program.cs         # App-konfiguration
+```
+
+---
+
+## 🔧 Felsökning
+
+### Problem: "API:et är inte tillgängligt"
+**Lösning:**
+1. Kontrollera att API:et körs: `dotnet run` i `api/`-mappen
+2. Verifiera att port 5050 är ledig
+3. Kontrollera firewall-inställningar
+
+### Problem: "Databasanslutning misslyckades"
+**Lösning:**
+1. Kontrollera SQL Server är igång
+2. Uppdatera `appsettings.json` med rätt connection string
+3. Kör: `dotnet ef database update`
+
+### Problem: "3 prickar istället för spel-antal"
+**Lösning:**
+1. Vänta på att spelen laddar
+2. Uppdatera sidan (Ctrl+F5)
+3. Kontrollera att API:et returnerar spel korrekt
+
+### Problem: "Login fungerar inte"
+**Lösning:**
+1. Kontrollera användarnamn/lösenord är korrekt
+2. Verifiera att API:et är igång
+3. Se error-banner på sidan för detaljerat felmeddelande
+4. Öppna DevTools (F12) > Console för API-fel
+
+---
+
+## 📝 Licens
+
+Detta projekt är licensierat under MIT License.
+
+---
+
+## 👨‍💻 Utvecklare
+
+Skapat av: **Tomas Hertzman**
+
+---
+
+## 🎮 Framtida Förbättringar (Roadmap)
+
+- [ ] Lägg till player-hantering
+- [ ] Implementera match-resultat
+- [ ] Lägg till ranking/poängsystem
+- [ ] Dark mode toggle
+- [ ] Exportera data till CSV/PDF
+- [ ] Real-time notifications med WebSockets
+- [ ] Mobil-app
+
+---
+
+Lycka till med Tournament Manager! ⚔️🎲
 
 Navigera till `frontend/index.html` i din webbläsare eller använd en lokal webbserver:
 
