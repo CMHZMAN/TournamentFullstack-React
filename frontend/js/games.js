@@ -53,18 +53,61 @@ function renderGames(games) {
         return;
     }
 
-    gamesList.innerHTML = games.map(game => `
-        <div class="game-card">
-            <h3>${escapeHtml(game.title)}</h3>
-            <div class="card-info">
-                <div><span>Tid:</span> ${new Date(game.time).toLocaleString('sv-SE')}</div>
+    gamesList.innerHTML = games.map(game => {
+        const gameTime = new Date(game.time);
+        const timeStr = gameTime.toLocaleString('sv-SE', { 
+            year: 'numeric', 
+            month: '2-digit', 
+            day: '2-digit', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+        });
+
+        return `
+            <div class="game-card" id="game-${game.id}">
+                <div id="view-${game.id}" class="game-view">
+                    <h3>${escapeHtml(game.title)}</h3>
+                    <div class="card-info">
+                        <div><span>Tid:</span> ${timeStr}</div>
+                    </div>
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="editGame(${game.id})">Redigera</button>
+                        <button class="btn btn-danger" onclick="deleteGame(${game.id})">Ta bort</button>
+                    </div>
+                </div>
+                <div id="edit-${game.id}" class="game-edit" style="display: none;">
+                    <div class="form-group">
+                        <label>Titel:</label>
+                        <input type="text" id="edit-title-${game.id}" value="${escapeHtml(game.title)}" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Datum:</label>
+                        <input type="date" id="edit-date-${game.id}" value="${gameTime.toISOString().split('T')[0]}" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Timme:</label>
+                        <select id="edit-hour-${game.id}" class="form-input">
+                            ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}" ${gameTime.getHours() === i ? 'selected' : ''}>${String(i).padStart(2, '0')}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Minut:</label>
+                        <select id="edit-minute-${game.id}" class="form-input">
+                            <option value="00" ${gameTime.getMinutes() === 0 ? 'selected' : ''}>00</option>
+                            <option value="15" ${gameTime.getMinutes() === 15 ? 'selected' : ''}>15</option>
+                            <option value="30" ${gameTime.getMinutes() === 30 ? 'selected' : ''}>30</option>
+                            <option value="45" ${gameTime.getMinutes() === 45 ? 'selected' : ''}>45</option>
+                        </select>
+                    </div>
+                    <div id="edit-error-${game.id}" class="error-message"></div>
+                    <div class="card-actions">
+                        <button class="btn btn-primary" onclick="saveGameEdit(${game.id})">Spara</button>
+                        <button class="btn btn-secondary" onclick="cancelEditGame(${game.id})">Avbryt</button>
+                    </div>
+                </div>
             </div>
-            <div class="card-actions">
-                <button class="btn btn-primary" onclick="editGame(${game.id})">Redigera</button>
-                <button class="btn btn-danger" onclick="deleteGame(${game.id})">Ta bort</button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 /**
@@ -108,8 +151,13 @@ async function handleGameFormSubmit(e) {
     try {
         errorElement.textContent = '';
 
-        // Validate that time is in the future
-        const gameTime = new Date(time);
+        const dateValue = formData.get('game-form-date');
+        const hour = formData.get('game-form-hour');
+        const minute = formData.get('game-form-minute');
+
+        // Skapa tid UTAN timezone-konvertering (bare ISO-string utan Z)
+        const localDateTime = `${dateValue}T${hour}:${minute}:00`;
+        const gameTime = new Date(localDateTime);
         const now = new Date();
 
         if (gameTime <= now) {
@@ -117,12 +165,16 @@ async function handleGameFormSubmit(e) {
             return;
         }
 
-        // Create game object
+        // Skicka tiden utan timezone-konvertering
         const gameData = {
             title,
-            time: gameTime.toISOString(),
-            tournamentId: selectedTournamentId
+            time: localDateTime
         };
+
+        // Only add tournamentId for new games (not for updates)
+        if (!editingGameId) {
+            gameData.tournamentId = selectedTournamentId;
+        }
 
         // Check if we're updating or creating
         if (editingGameId) {
@@ -140,6 +192,13 @@ async function handleGameFormSubmit(e) {
         hideGameForm();
         await loadGamesForTournament(selectedTournamentId);
 
+        // Update tournament game count
+        const tournament = tournamentsData.find(t => t.id === selectedTournamentId);
+        if (tournament) {
+            // Reload tournaments to update counts
+            await loadTournaments();
+        }
+
         console.log('Game saved successfully');
     } catch (error) {
         console.error('Error saving game:', error);
@@ -148,24 +207,84 @@ async function handleGameFormSubmit(e) {
 }
 
 /**
- * Edit game - populate form with data
+ * Edit game - Show inline edit form
  */
-async function editGame(gameId) {
-    const game = gamesData.find(g => g.id === gameId);
-    if (!game) return;
+function editGame(gameId) {
+    const viewDiv = document.getElementById(`view-${gameId}`);
+    const editDiv = document.getElementById(`edit-${gameId}`);
 
-    // Fill form with game data
-    document.getElementById('game-title').value = game.title;
-    document.getElementById('game-time').value = new Date(game.time).toISOString().slice(0, 16);
+    if (viewDiv) viewDiv.style.display = 'none';
+    if (editDiv) editDiv.style.display = 'block';
 
-    // Change button text and set editing state
-    const submitBtn = document.querySelector('#game-form button[type="submit"]');
-    submitBtn.textContent = 'Uppdatera spel';
-    editingGameId = gameId;
+    // Focus on title field
+    setTimeout(() => document.getElementById(`edit-title-${gameId}`).focus(), 100);
+}
 
-    // Show form
-    document.getElementById('game-form').classList.remove('hidden');
-    document.getElementById('game-form').scrollIntoView({ behavior: 'smooth' });
+/**
+ * Cancel edit game
+ */
+function cancelEditGame(gameId) {
+    const viewDiv = document.getElementById(`view-${gameId}`);
+    const editDiv = document.getElementById(`edit-${gameId}`);
+
+    if (editDiv) editDiv.style.display = 'none';
+    if (viewDiv) viewDiv.style.display = 'block';
+}
+
+/**
+ * Save game edit - UTAN TIMEZONE-KONVERTERING
+ */
+async function saveGameEdit(gameId) {
+    try {
+        const title = document.getElementById(`edit-title-${gameId}`).value;
+        const dateValue = document.getElementById(`edit-date-${gameId}`).value;
+        const hour = document.getElementById(`edit-hour-${gameId}`).value;
+        const minute = document.getElementById(`edit-minute-${gameId}`).value;
+        const errorElement = document.getElementById(`edit-error-${gameId}`);
+
+        errorElement.textContent = '';
+
+        if (!title.trim()) {
+            errorElement.textContent = 'Titel är obligatorisk';
+            return;
+        }
+
+        // Skapa datum UTAN timezone-konvertering
+        // Format: YYYY-MM-DDTHH:mm:ss (utan Z för UTC)
+        const localDateTime = `${dateValue}T${hour}:${minute}:00`;
+        const gameTime = new Date(localDateTime);
+        const now = new Date();
+
+        if (gameTime <= now) {
+            errorElement.textContent = 'Datum och tid måste vara i framtiden';
+            return;
+        }
+
+        // Skicka tiden utan timezone-konvertering
+        const gameData = {
+            title: title.trim(),
+            time: localDateTime
+        };
+
+        await apiClient.updateGame(selectedTournamentId, gameId, gameData);
+
+        // Reload games
+        await loadGamesForTournament(selectedTournamentId);
+
+        // Reload tournaments to update counts
+        const tournament = tournamentsData.find(t => t.id === selectedTournamentId);
+        if (tournament) {
+            await loadTournaments();
+        }
+
+        console.log('Game saved successfully');
+    } catch (error) {
+        console.error('Error saving game:', error);
+        const errorElement = document.getElementById(`edit-error-${gameId}`);
+        if (errorElement) {
+            errorElement.textContent = `Fel: ${error.message}`;
+        }
+    }
 }
 
 /**

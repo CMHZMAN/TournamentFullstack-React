@@ -136,14 +136,32 @@
                             <h4>Lägg till nytt spel</h4>
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="game-title">Spel namn:</label>
-                                    <input type="text" id="game-title" name="title" required>
+                                    <label for="game-form-title">Spel namn:</label>
+                                    <input type="text" id="game-form-title" name="title" required>
                                 </div>
                                 <div class="form-group">
-                                    <label for="game-time">Tid:</label>
-                                    <input type="datetime-local" id="game-time" name="time" required>
+                                    <label for="game-form-date">Datum:</label>
+                                    <input type="date" id="game-form-date" name="game-form-date" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="game-form-hour">Timme:</label>
+                                    <select id="game-form-hour" name="game-form-hour" required>
+                                        <option value="">-- Välj timme --</option>
+                                        ${Array.from({length: 24}, (_, i) => `<option value="${String(i).padStart(2, '0')}">${String(i).padStart(2, '0')}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="game-form-minute">Minut:</label>
+                                    <select id="game-form-minute" name="game-form-minute" required>
+                                        <option value="">-- Välj minut --</option>
+                                        <option value="00">00</option>
+                                        <option value="15">15</option>
+                                        <option value="30">30</option>
+                                        <option value="45">45</option>
+                                    </select>
                                 </div>
                             </div>
+                            <div id="game-form-error" class="error-message"></div>
                             <div class="form-actions">
                                 <button type="submit" class="btn btn-primary">Spara</button>
                                 <button type="button" class="btn btn-secondary" onclick="hideGameForm()">Avbryt</button>
