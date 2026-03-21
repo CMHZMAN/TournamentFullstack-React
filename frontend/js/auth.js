@@ -24,35 +24,33 @@ class AuthManager {
 
     /**
      * Login user
-     * NOTE: In a real application, you would send credentials to a backend login endpoint
-     * that verifies them and returns a JWT token. For now, this is a placeholder.
+     * Sends credentials to the backend API and receives a JWT token
      */
     async login(username, password) {
         try {
-            // TODO: Replace with actual API endpoint for authentication
-            // For now, we'll accept any username/password and create a mock token
-            // In production, send to backend: POST /api/auth/login
-            
             if (!username || !password) {
                 throw new Error('Användarnamn och lösenord är obligatoriska');
             }
 
-            // Mock JWT token (in reality, this comes from the server)
-            // Format: header.payload.signature
-            const mockPayload = {
-                sub: username,
-                name: username,
-                iat: Math.floor(Date.now() / 1000),
-                exp: Math.floor(Date.now() / 1000) + (3600 * 24) // 24 hours
-            };
+            // Call the real API endpoint for authentication
+            const response = await fetch(`${apiClient.baseUrl}/auth/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            });
 
-            // Create a mock JWT token (not valid, but good for demo)
-            const mockToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.${btoa(JSON.stringify(mockPayload))}.mock_signature`;
+            const data = await response.json();
 
-            // Save token and user info
-            apiClient.setToken(mockToken);
+            if (!response.ok) {
+                throw new Error(data.error || 'Inloggning misslyckades');
+            }
+
+            // Save the real JWT token from the server
+            apiClient.setToken(data.token);
             this.currentUser = {
-                username: username,
+                username: data.username,
                 loginTime: new Date().toISOString()
             };
             localStorage.setItem('current_user', JSON.stringify(this.currentUser));
