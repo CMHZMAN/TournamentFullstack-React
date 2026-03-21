@@ -30,7 +30,7 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = "TournamentAPI",
         ValidAudience = "TournamentClient",
         IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.FromSeconds(5) // Tillåt 5 sekunders skew för server-tids-osynkronisering
     };
     options.Events = new JwtBearerEvents
     {
@@ -87,7 +87,11 @@ catch (Exception ex)
 }
 
 // Configure the HTTP request pipeline.
-app.UseHttpsRedirection();
+// Skip HTTPS redirection in development (local development uses HTTP)
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // Enable CORS
 app.UseCors("AllowFrontend");

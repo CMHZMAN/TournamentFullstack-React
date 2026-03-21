@@ -14,7 +14,7 @@ En medeltida-inspirerad fullstack-webbapplikation för att hantera turneringar o
 - .NET 10.0 SDK
 - SQL Server (MARCUSALPTOP\SQLEXPRESS)
 - Modern webbläsare
-- Python 3 (för webbserver)
+- Node.js (för webbserver)
 
 ### 🎯 Starta Applikationen
 
@@ -27,7 +27,7 @@ dotnet run
 **Terminal 2 - Frontend:**
 ```powershell
 cd frontend
-python -m http.server 8000
+npx http-server -p 8000
 ```
 
 **Webbläsare:**

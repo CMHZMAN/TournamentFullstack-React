@@ -48,12 +48,15 @@ I **Fönster 2** (Frontend):
 
 ```powershell
 cd C:\Users\Marcus\source\repos\TournamentFullstack\frontend
-python -m http.server 8000
+npx http-server -p 8000
 ```
 
 **Du ska se:**
 ```
-Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+Starting up http-server, serving ./
+Available on:
+  http://127.0.0.1:8000
+  ...
 ```
 
 ✅ Webbserver är nu igång!

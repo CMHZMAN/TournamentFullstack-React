@@ -232,13 +232,15 @@ TournamentFullstack/
 
 - [ ] Läs [`README_START_HERE.md`](README_START_HERE.md)
 - [ ] Läs [`STARTGUIDE.md`](STARTGUIDE.md)
+- [ ] Läs [`JWT_STATUS.md`](JWT_STATUS.md) - JWT-autentisering är fixad!
 - [ ] Kontrollera SQL Server är igång
 - [ ] Starta Backend: `cd api && dotnet run`
 - [ ] Starta Frontend: `cd frontend && python -m http.server 8000`
 - [ ] Öppna http://localhost:8000
 - [ ] Logga in med testuser/password123
+- [ ] Se [`TESTING_GUIDE.md`](TESTING_GUIDE.md) för test-instruktioner
 - [ ] Testa - skapa turnering, lägg till spel
-- [ ] Allt fungerar? → Du är klar!
+- [ ] Allt fungerar? → Du är klar! ✅
 
 ---
 

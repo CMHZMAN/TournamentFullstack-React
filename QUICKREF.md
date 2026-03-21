@@ -12,9 +12,9 @@ dotnet run
 ### Terminal 2 - Starta Frontend
 ```powershell
 cd C:\Users\Marcus\source\repos\TournamentFullstack\frontend
-python -m http.server 8000
+npx http-server -p 8000
 ```
-⏳ Vänta tills du ser: `Serving HTTP on 0.0.0.0 port 8000`
+⏳ Vänta tills du ser: `Starting up http-server, serving ./`
 
 ### Webbläsare
 ```

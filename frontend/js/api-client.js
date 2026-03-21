@@ -68,7 +68,13 @@ class ApiClient {
             // Handle 401 Unauthorized - token might be expired
             if (response.status === 401) {
                 this.removeToken();
-                window.location.href = '/';
+                localStorage.removeItem('current_user');
+                // Show login section and hide app section
+                const loginSection = document.getElementById('login-section');
+                const appSection = document.getElementById('app-section');
+                if (loginSection) loginSection.classList.remove('hidden');
+                if (appSection) appSection.classList.add('hidden');
+                showErrorBanner('Din session har gått ut. Vänligen logga in igen.');
                 throw new Error('Token expired or invalid. Please login again.');
             }
 

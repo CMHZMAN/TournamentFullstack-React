@@ -70,20 +70,22 @@ public class AuthController : ControllerBase
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("TournamentAPI-SecretKey-MinimumLengthFor256BitKey-SuperSecretAndLong"));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+        var expiresAt = DateTime.UtcNow.AddHours(24);
+
         var claims = new[]
         {
-            new Claim("sub", username),
-            new Claim("name", username),
-            new Claim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
-            new Claim("exp", DateTimeOffset.UtcNow.AddHours(24).ToUnixTimeSeconds().ToString())
+            new Claim(ClaimTypes.NameIdentifier, username),
+            new Claim(ClaimTypes.Name, username),
+            new Claim("sub", username)
         };
 
         var token = new JwtSecurityToken(
             issuer: "TournamentAPI",
             audience: "TournamentClient",
             claims: claims,
-            expires: DateTime.UtcNow.AddHours(24),
-            signingCredentials: credentials
+            expires: expiresAt,
+            signingCredentials: credentials,
+            notBefore: DateTime.UtcNow
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
