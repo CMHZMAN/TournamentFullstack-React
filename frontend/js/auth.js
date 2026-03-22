@@ -178,5 +178,11 @@ function checkAuthentication() {
  * Load initial data when app starts
  */
 async function loadInitialData() {
-    // This will be called from tournaments.js and games.js
+    try {
+        // Load tournaments when app first loads
+        await loadTournaments();
+    } catch (error) {
+        console.error('Error loading initial data:', error);
+        showErrorBanner(`Fel vid inladdning av data: ${error.message}`);
+    }
 }

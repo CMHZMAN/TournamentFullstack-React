@@ -19,6 +19,10 @@ function initializeApp() {
     if (gameForm) {
         gameForm.addEventListener('submit', handleGameFormSubmit);
     }
+
+    // Populera timväljare
+    populateHourSelect();
+    populateMinuteSelect();
 }
 
 /**
@@ -66,3 +70,50 @@ function closeErrorBanner() {
 window.addEventListener('load', () => {
     // Additional setup if needed
 });
+
+/**
+ * Populera timväljare (00-23)
+ */
+function populateHourSelect() {
+    const hourSelect = document.getElementById('game-form-hour');
+    if (!hourSelect) {
+        console.error('game-form-hour element not found');
+        return;
+    }
+
+    // Rensa alla options utom första
+    while (hourSelect.options.length > 1) {
+        hourSelect.remove(1);
+    }
+
+    // Lägg till timmar
+    for (let i = 0; i < 24; i++) {
+        const hour = String(i).padStart(2, '0');
+        const option = document.createElement('option');
+        option.value = hour;
+        option.textContent = hour;
+        hourSelect.appendChild(option);
+    }
+}
+
+/**
+ * Populera minutväljare (00, 15, 30, 45)
+ */
+function populateMinuteSelect() {
+    const minuteSelect = document.getElementById('game-form-minute');
+    if (!minuteSelect) return;
+
+    // Rensa alla options utom första
+    while (minuteSelect.options.length > 1) {
+        minuteSelect.remove(1);
+    }
+
+    // Lägg till minuter
+    const minutes = ['00', '15', '30', '45'];
+    minutes.forEach(minute => {
+        const option = document.createElement('option');
+        option.value = minute;
+        option.textContent = minute;
+        minuteSelect.appendChild(option);
+    });
+}

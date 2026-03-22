@@ -114,11 +114,16 @@ function renderGames(games) {
  * Show new game form
  */
 function showNewGameForm() {
-    document.getElementById('game-form').classList.remove('hidden');
-    document.getElementById('game-form').reset();
+    const gameForm = document.getElementById('game-form');
+    gameForm.classList.remove('hidden');
+    gameForm.reset();
     editingGameId = null;
-    const submitBtn = document.querySelector('#game-form button[type="submit"]');
+
+    const submitBtn = gameForm.querySelector('button[type="submit"]');
     submitBtn.textContent = 'Lägg till spel';
+
+    // Populera timväljare
+    populateHourSelect();
 }
 
 /**
