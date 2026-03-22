@@ -34,7 +34,7 @@ TournamentFullstack/
 ### Backend
 - **Framework**: ASP.NET Core 10.0
 - **Språk**: C#
-- **Databas**: SQL Server (MARCUSLAPTOP\SQLEXPRESS)
+- **Databas**: SQL Server 
 - **ORM**: Entity Framework Core 8.0
 - **API-stil**: REST med CORS
 
