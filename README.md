@@ -109,3 +109,14 @@ Se **IMPLEMENTATION.md** för:
 **Status:** ✅ Production Ready  
 **Version:** 1.0.0  
 **Skapad:** 2026-03-20
+
+---
+Just nu finns det ingen medlemshantering och det borde också läggas till funktion att kunna hantera administratörer.
+---
+
+Vad som gick bra: Det har varit en kul uppgift att koppla föregående projekt och sedan kunnat utveckla in till ett mer komplett fullstack.
+Det har varit kul att se utvecklingen av min struktur och clean code. 
+
+---
+
+Vad som var svårt: Det tuffaste har varit att försöka sluta gå för "Overkill" :)
