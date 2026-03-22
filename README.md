@@ -15,7 +15,7 @@ Tournament Manager låter dig:
 
 ### Förutsättningar
 - .NET 10.0 SDK
-- SQL Server (MARCUSLAPTOP\SQLEXPRESS med databas TournamentDB)
+- SQL Server (Koppling till databasinstans med databas TournamentDB)
 - Node.js (för webserver)
 - Modern webbläsare
 
