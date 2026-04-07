@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 
-export function GameForm({ onSubmit, onCancel, error }) {
+export function GameForm({ onSubmit, onCancel, error, tournamentId }) {
     const [formData, setFormData] = useState({
         title: '',
         date: '',
@@ -30,7 +30,8 @@ export function GameForm({ onSubmit, onCancel, error }) {
             const dateTime = new Date(`${formData.date}T${formData.hour}:${formData.minute}:00`);
             await onSubmit({
                 title: formData.title,
-                time: dateTime.toISOString()
+                time: dateTime.toISOString(),
+                tournamentId: tournamentId
             });
             setFormData({
                 title: '',

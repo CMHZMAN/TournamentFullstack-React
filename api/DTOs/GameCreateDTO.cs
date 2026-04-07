@@ -36,9 +36,10 @@ public class GameCreateDTO
             return new ValidationResult("Invalid time format");
         }
 
-        if (time.ToUniversalTime() <= DateTime.UtcNow)
+        // Allow times up to 1 minute in the past to account for timezone/clock differences
+        if (time.ToUniversalTime() < DateTime.UtcNow.AddMinutes(-1))
         {
-            return new ValidationResult("Time cannot be in the past");
+            return new ValidationResult("Time cannot be significantly in the past");
         }
         return ValidationResult.Success;
     }

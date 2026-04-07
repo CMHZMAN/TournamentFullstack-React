@@ -143,6 +143,7 @@ export function TournamentDetails({
                                 onSubmit={handleGameCreate}
                                 onCancel={() => setShowGameForm(false)}
                                 error={gamesError}
+                                tournamentId={tournament.id}
                             />
                         )}
 
