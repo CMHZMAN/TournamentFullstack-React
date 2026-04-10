@@ -43,6 +43,16 @@ body {
     100% { background-position: 0% 50%; }
 }
 
+/* Scan-line animation */
+@keyframes scanline {
+    0% {
+        top: -100%;
+    }
+    100% {
+        top: 100%;
+    }
+}
+
 /* Futuristic grid pattern overlay */
 body::before {
     content: '';
@@ -205,6 +215,8 @@ body::before {
         0 0 30px rgba(131, 56, 236, 0.2);
     letter-spacing: 2px;
     margin-bottom: 15px;
+    position: relative;
+    z-index: 3;
 }
 
 .login-form > p {
@@ -346,6 +358,27 @@ body::before {
     min-height: calc(100vh - 80px);
     margin-top: 80px;
     gap: 20px;
+    position: relative;
+}
+
+/* Animated scan-line effect - always visible in main app */
+.app-layout::before {
+    content: '';
+    position: fixed;
+    top: 80px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(0, 217, 255, 0.7) 25%, 
+        rgba(131, 56, 236, 0.7) 50%, 
+        rgba(0, 217, 255, 0.7) 75%, 
+        transparent 100%);
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.9), 0 0 25px rgba(131, 56, 236, 0.6);
+    animation: scanline 8s linear infinite;
+    pointer-events: none;
+    z-index: 0;
 }
 
 .tournaments-sidebar {
@@ -457,13 +490,6 @@ body::before {
     text-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
 }
 
-/* Tournament Details View */
-.tournament-details-view {
-    display: block;
-    overflow-y: auto;
-    flex: 1;
-    padding: 30px;
-}
 
 .tournament-header {
     display: block;
@@ -500,10 +526,12 @@ body::before {
     gap: 20px;
     margin-bottom: 30px;
     padding: 20px;
-    background: linear-gradient(135deg, rgba(0, 217, 255, 0.05) 0%, rgba(131, 56, 236, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(0, 217, 255, 0.15) 0%, rgba(131, 56, 236, 0.15) 100%);
     border-radius: var(--border-radius);
     border: 1px solid rgba(0, 217, 255, 0.2);
     backdrop-filter: blur(10px);
+    position: relative;
+    z-index: 10;
 }
 
 .meta-item {
@@ -630,13 +658,15 @@ body::before {
 /* Cards */
 .tournament-card,
 .game-card {
-    background: linear-gradient(135deg, rgba(26, 31, 58, 0.8) 0%, rgba(10, 14, 39, 0.9) 100%);
+    background: linear-gradient(135deg, rgba(26, 31, 58, 0.15) 0%, rgba(10, 14, 39, 0.15) 100%);
     border-radius: var(--border-radius);
     padding: 20px;
     box-shadow: 0 0 20px rgba(0, 217, 255, 0.1);
     transition: var(--transition);
     border: 1px solid rgba(0, 217, 255, 0.2);
     backdrop-filter: blur(5px);
+    position: relative;
+    z-index: 10;
 }
 
 .tournament-card:hover,

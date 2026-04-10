@@ -34,6 +34,11 @@ function App() {
     }
   }, [isLoggedIn, isGuest, loadTournaments]);
 
+  // Clear selected tournament when logging in/out
+  useEffect(() => {
+    setSelectedTournament(null);
+  }, [isLoggedIn, isGuest]);
+
   // Update error message
   useEffect(() => {
     if (authError) {
