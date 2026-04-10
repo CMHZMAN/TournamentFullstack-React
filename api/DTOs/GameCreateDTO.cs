@@ -15,6 +15,9 @@ public class GameCreateDTO
     [Range(1, int.MaxValue, ErrorMessage = "TournamentId must be valid")]
     public int TournamentId { get; set; }
 
+    // The user who created this game (from JWT token)
+    public int? CreatedByUserId { get; set; }
+
     public static ValidationResult? ValidateTime(object? value, ValidationContext context)
     {
         if (value == null)

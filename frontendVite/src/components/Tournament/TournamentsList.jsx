@@ -1,15 +1,17 @@
-export function TournamentsList({ tournaments, selectedId, onSelect, onAddClick, isLoading }) {
+export function TournamentsList({ tournaments, selectedId, onSelect, onAddClick, isLoading, isGuest }) {
     return (
         <aside className="tournaments-sidebar">
             <div className="sidebar-header">
                 <h2>Turneringar</h2>
-                <button
-                    className="btn btn-primary btn-small"
-                    onClick={onAddClick}
-                    disabled={isLoading}
-                >
-                    + Ny
-                </button>
+                {!isGuest && (
+                    <button
+                        className="btn btn-primary btn-small"
+                        onClick={onAddClick}
+                        disabled={isLoading}
+                    >
+                        + Ny
+                    </button>
+                )}
             </div>
 
             <div className="tournaments-list-sidebar">

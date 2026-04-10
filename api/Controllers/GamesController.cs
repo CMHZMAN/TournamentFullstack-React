@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using TournamentAPI.DTOs;
 using TournamentAPI.Services;
 
@@ -7,7 +8,6 @@ namespace TournamentAPI.Controllers;
 
 [ApiController]
 [Route("api/tournaments/{tournamentId}/[controller]")]
-[Authorize]
 public class GamesController : ControllerBase
 {
     private readonly IGameService _gameService;
@@ -25,6 +25,19 @@ public class GamesController : ControllerBase
         _tournamentService = tournamentService;
         _rateLimitingService = rateLimitingService;
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Get the current user ID from JWT token
+    /// </summary>
+    private int? GetCurrentUserId()
+    {
+        var userIdClaim = User.FindFirst("sub");
+        if (userIdClaim != null && int.TryParse(userIdClaim.Value, out var userId))
+        {
+            return userId;
+        }
+        return null;
     }
 
     [HttpGet]
@@ -60,6 +73,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,User")]
     public async Task<ActionResult<GameResponseDTO>> CreateGame(
         int tournamentId,
         [FromBody] GameCreateDTO createDTO)
@@ -84,6 +98,10 @@ public class GamesController : ControllerBase
             return BadRequest(new { error = "Tournament ID in body does not match route parameter" });
         }
 
+        // Set the current user as the creator
+        var userId = GetCurrentUserId();
+        createDTO.CreatedByUserId = userId;
+
         if (!ModelState.IsValid)
         {
             return BadRequest(ModelState);
@@ -105,6 +123,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin,User")]
     public async Task<ActionResult<GameResponseDTO>> UpdateGame(
         int tournamentId,
         int id,
@@ -145,6 +164,7 @@ public class GamesController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize]
     public async Task<ActionResult> DeleteGame(int tournamentId, int id)
     {
         // Verify tournament exists
@@ -159,6 +179,16 @@ public class GamesController : ControllerBase
         if (game == null || game.TournamentId != tournamentId)
         {
             return NotFound();
+        }
+
+        // Check authorization: Admin can delete any game, User can only delete their own
+        var isAdmin = User.IsInRole("Admin");
+        var currentUserId = GetCurrentUserId();
+        var isOwner = game.CreatedByUserId == currentUserId;
+
+        if (!isAdmin && !isOwner)
+        {
+            return Forbid("You can only delete your own games");
         }
 
         var success = await _gameService.DeleteAsync(id);

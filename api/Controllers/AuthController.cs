@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
+using TournamentAPI.DTOs;
+using TournamentAPI.Services;
 
 namespace TournamentAPI.Controllers;
 
@@ -10,93 +8,70 @@ namespace TournamentAPI.Controllers;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
+    private readonly IAuthService _authService;
     private readonly ILogger<AuthController> _logger;
-    private readonly IConfiguration _configuration;
 
-    public AuthController(ILogger<AuthController> logger, IConfiguration configuration)
+    public AuthController(IAuthService authService, ILogger<AuthController> logger)
     {
+        _authService = authService;
         _logger = logger;
-        _configuration = configuration;
     }
 
     /// <summary>
-    /// Login endpoint - Returns a JWT token
-    /// For this school project, we accept any username/password combination
+    /// Register new user
     /// </summary>
-    [HttpPost("login")]
-    public IActionResult Login([FromBody] LoginRequest loginRequest)
+    [HttpPost("register")]
+    public async Task<ActionResult<LoginResponseDTO>> Register([FromBody] RegisterDTO dto)
     {
-        if (loginRequest == null || string.IsNullOrEmpty(loginRequest.Username) || string.IsNullOrEmpty(loginRequest.Password))
-        {
-            return BadRequest(new { error = "Användarnamn och lösenord är obligatoriska" });
-        }
-
-        // For school project: Accept any non-empty username/password
-        // In production, verify against a user database
-        if (string.IsNullOrWhiteSpace(loginRequest.Username) || loginRequest.Username.Length < 2)
-        {
-            return BadRequest(new { error = "Användarnamn måste vara minst 2 tecken" });
-        }
-
-        if (string.IsNullOrWhiteSpace(loginRequest.Password) || loginRequest.Password.Length < 3)
-        {
-            return BadRequest(new { error = "Lösenord måste vara minst 3 tecken" });
-        }
-
         try
         {
-            var token = GenerateJwtToken(loginRequest.Username);
-            _logger.LogInformation($"User '{loginRequest.Username}' logged in successfully");
-
-            return Ok(new
+            if (!ModelState.IsValid)
             {
-                token = token,
-                username = loginRequest.Username,
-                message = "Inloggning lyckades"
-            });
+                return BadRequest(ModelState);
+            }
+
+            var response = await _authService.RegisterAsync(dto);
+            _logger.LogInformation($"User '{dto.Username}' registered successfully");
+            return Ok(response);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning($"Registration failed: {ex.Message}");
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"Registration error: {ex.Message}");
+            return StatusCode(500, new { error = "Registration failed. Please try again later." });
+        }
+    }
+
+    /// <summary>
+    /// Login user
+    /// </summary>
+    [HttpPost("login")]
+    public async Task<ActionResult<LoginResponseDTO>> Login([FromBody] LoginDTO dto)
+    {
+        try
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var response = await _authService.LoginAsync(dto);
+            _logger.LogInformation($"User '{dto.Username}' logged in successfully");
+            return Ok(response);
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning($"Login failed: {ex.Message}");
+            return Unauthorized(new { error = "Invalid username or password" });
         }
         catch (Exception ex)
         {
             _logger.LogError($"Login error: {ex.Message}");
-            return StatusCode(500, new { error = "Inloggning misslyckades. Försök igen senare." });
+            return StatusCode(500, new { error = "Login failed. Please try again later." });
         }
     }
-
-    /// <summary>
-    /// Generate JWT Token
-    /// </summary>
-    private string GenerateJwtToken(string username)
-    {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("TournamentAPI-SecretKey-MinimumLengthFor256BitKey-SuperSecretAndLong"));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var expiresAt = DateTime.UtcNow.AddHours(24);
-
-        var claims = new[]
-        {
-            new Claim(ClaimTypes.NameIdentifier, username),
-            new Claim(ClaimTypes.Name, username),
-            new Claim("sub", username)
-        };
-
-        var token = new JwtSecurityToken(
-            issuer: "TournamentAPI",
-            audience: "TournamentClient",
-            claims: claims,
-            expires: expiresAt,
-            signingCredentials: credentials,
-            notBefore: DateTime.UtcNow
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
-}
-
-/// <summary>
-/// Login request DTO
-/// </summary>
-public class LoginRequest
-{
-    public string? Username { get; set; }
-    public string? Password { get; set; }
 }

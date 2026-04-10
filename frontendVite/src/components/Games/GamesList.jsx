@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export function GamesList({ games, isLoading, onEdit, onDelete }) {
+export function GamesList({ games, isLoading, onEdit, onDelete, isGuest }) {
     const [editingGameId, setEditingGameId] = useState(null);
     const [editData, setEditData] = useState({});
 
@@ -125,20 +125,22 @@ export function GamesList({ games, isLoading, onEdit, onDelete }) {
                                     <div className="card-info">
                                         <div><span>Tid:</span> {timeStr}</div>
                                     </div>
-                                    <div className="card-actions">
-                                        <button
-                                            className="btn btn-primary"
-                                            onClick={() => handleEditClick(game)}
-                                        >
-                                            Redigera
-                                        </button>
-                                        <button
-                                            className="btn btn-danger"
-                                            onClick={() => onDelete(game.id)}
-                                        >
-                                            Ta bort
-                                        </button>
-                                    </div>
+                                    {!isGuest && (
+                                        <div className="card-actions">
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={() => handleEditClick(game)}
+                                            >
+                                                Redigera
+                                            </button>
+                                            <button
+                                                className="btn btn-danger"
+                                                onClick={() => onDelete(game.id)}
+                                            >
+                                                Ta bort
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             )}
                         </div>

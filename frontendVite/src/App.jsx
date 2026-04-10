@@ -4,16 +4,18 @@ import { useTournaments } from './hooks/useTournaments';
 import { ErrorBanner } from './components/Common/ErrorBanner';
 import { Header } from './components/Common/Header';
 import { LoginForm } from './components/Auth/LoginForm';
+import { RegisterForm } from './components/Auth/RegisterForm';
 import { TournamentsList } from './components/Tournament/TournamentsList';
 import { TournamentDetails } from './components/Tournament/TournamentDetails';
 import { TournamentForm } from './components/Tournament/TournamentForm';
 import './index.css';
 
 function App() {
-  const { isLoggedIn, isLoading: authLoading, login, error: authError } = useAuth();
+  const { isLoggedIn, isGuest, isLoading: authLoading, login, register, loginAsGuest, error: authError } = useAuth();
   const [errorMessage, setErrorMessage] = useState('');
   const [selectedTournament, setSelectedTournament] = useState(null);
   const [showTournamentForm, setShowTournamentForm] = useState(false);
+  const [showRegisterForm, setShowRegisterForm] = useState(false);
 
   const {
     tournaments,
@@ -25,12 +27,12 @@ function App() {
     deleteTournament
   } = useTournaments();
 
-  // Load tournaments when logged in
+  // Load tournaments when logged in or in guest mode
   useEffect(() => {
-    if (isLoggedIn) {
+    if (isLoggedIn || isGuest) {
       loadTournaments();
     }
-  }, [isLoggedIn, loadTournaments]);
+  }, [isLoggedIn, isGuest, loadTournaments]);
 
   // Update error message
   useEffect(() => {
@@ -46,6 +48,19 @@ function App() {
       await login(credentials.username, credentials.password);
     } catch (err) {
       console.error('Login error:', err);
+    }
+  };
+
+  const handleGuestMode = () => {
+    loginAsGuest();
+  };
+
+  const handleRegister = async (credentials) => {
+    try {
+      await register(credentials.username, credentials.email, credentials.password);
+      setShowRegisterForm(false);
+    } catch (err) {
+      console.error('Register error:', err);
     }
   };
 
@@ -89,7 +104,7 @@ function App() {
     );
   }
 
-  if (!isLoggedIn) {
+  if (!isLoggedIn && !isGuest) {
     return (
       <div className="section-container">
         <ErrorBanner
@@ -98,8 +113,21 @@ function App() {
         />
         <div className="login-form">
           <h1>Tournament Manager</h1>
-          <p>Logga in för att komma igång</p>
-          <LoginForm onSubmit={handleLogin} error={authError} />
+          <p>{showRegisterForm ? 'Skapa ditt konto för att börja' : 'Logga in för att komma igång'}</p>
+          {showRegisterForm ? (
+            <RegisterForm 
+              onSubmit={handleRegister} 
+              error={authError}
+              onSwitchToLogin={() => setShowRegisterForm(false)}
+            />
+          ) : (
+            <LoginForm 
+              onSubmit={handleLogin} 
+              error={authError}
+              onSwitchToRegister={() => setShowRegisterForm(true)}
+              onGuestMode={handleGuestMode}
+            />
+          )}
         </div>
       </div>
     );
@@ -120,10 +148,11 @@ function App() {
           onSelect={setSelectedTournament}
           onAddClick={() => setShowTournamentForm(!showTournamentForm)}
           isLoading={tournamentsLoading}
+          isGuest={isGuest}
         />
 
         <div style={{ flex: 1 }}>
-          {showTournamentForm ? (
+          {showTournamentForm && !isGuest ? (
             <TournamentForm
               onSubmit={handleTournamentCreate}
               onCancel={() => setShowTournamentForm(false)}
@@ -137,10 +166,11 @@ function App() {
               onGameCreated={() => loadTournaments()}
               onGameUpdated={() => loadTournaments()}
               onGameDeleted={() => loadTournaments()}
+              isGuest={isGuest}
             />
           ) : (
             <div className="no-selection">
-              <p>Välj en turnering från listan för att se och hantera spel</p>
+              <p>{isGuest ? 'Välj en turnering från listan för att se spel' : 'Välj en turnering från listan för att se och hantera spel'}</p>
             </div>
           )}
         </div>

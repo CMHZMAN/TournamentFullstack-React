@@ -64,6 +64,7 @@ builder.Services.AddDbContext<TournamentContext>(options =>
 // Register services with appropriate lifetimes
 builder.Services.AddScoped<ITournamentService, TournamentService>();
 builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<RateLimitingService>();
 
 // Add logging

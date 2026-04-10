@@ -7,7 +7,6 @@ namespace TournamentAPI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class TournamentsController : ControllerBase
 {
     private readonly ITournamentService _tournamentService;
@@ -51,6 +50,7 @@ public class TournamentsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Admin,User")]
     public async Task<ActionResult<TournamentResponseDTO>> CreateTournament(
         [FromBody] TournamentCreateDTO createDTO)
     {
@@ -78,6 +78,7 @@ public class TournamentsController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult<TournamentResponseDTO>> UpdateTournament(
         int id,
         [FromBody] TournamentUpdateDTO updateDTO)
@@ -103,6 +104,7 @@ public class TournamentsController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Admin")]
     public async Task<ActionResult> DeleteTournament(int id)
     {
         var success = await _tournamentService.DeleteAsync(id);

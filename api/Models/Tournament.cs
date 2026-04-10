@@ -7,7 +7,11 @@ public class Tournament
     public string? Description { get; set; }
     public int MaxPlayers { get; set; }
     public DateTime Date { get; set; }
-    
-    // Navigation property
+
+    // Foreign key - Who created this tournament (nullable for migration)
+    public int? CreatedByUserId { get; set; }
+
+    // Navigation properties
     public ICollection<Game> Games { get; set; } = new List<Game>();
+    public User? CreatedByUser { get; set; }
 }

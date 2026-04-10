@@ -65,14 +65,20 @@ export class ApiClient {
         try {
             const response = await fetch(url, config);
 
+            // Handle 401 Unauthorized (expired or invalid token)
             if (response.status === 401) {
+                console.warn('🔴 Token expired or invalid - clearing session');
                 this.removeToken();
                 localStorage.removeItem('current_user');
-                throw new Error('Token expired or invalid. Please login again.');
+                localStorage.removeItem('user_roles');
+                localStorage.removeItem('guest_mode');
+                // Redirect to login page
+                window.location.href = '/';
+                throw new Error('Sessionen gick ut. Vänligen logga in igen.');
             }
 
             if (response.status === 429) {
-                throw new Error('Too many requests. Please try again later.');
+                throw new Error('För många förfrågningar. Försök igen senare.');
             }
 
             const data = await response.json().catch(() => ({}));
@@ -86,11 +92,23 @@ export class ApiClient {
             console.error('API Error:', error);
 
             if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-                throw new Error('⚠️ Databasen är inte tillgänglig. Kontrollera att API-servern körs på http://localhost:5050');
+                throw new Error('⚠️ API-servern är inte tillgänglig. Kontrollera att den körs på http://localhost:5050');
             }
 
             throw error;
         }
+    }
+
+    /**
+     * Register user
+     */
+    async register(username, email, password) {
+        const response = await this.request('/auth/register', {
+            method: 'POST',
+            body: JSON.stringify({ username, email, password })
+        });
+        this.setToken(response.token);
+        return response;
     }
 
     /**

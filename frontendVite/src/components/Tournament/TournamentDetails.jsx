@@ -10,7 +10,8 @@ export function TournamentDetails({
     onDelete,
     onGameCreated,
     onGameUpdated,
-    onGameDeleted
+    onGameDeleted,
+    isGuest
 }) {
     const [showGameForm, setShowGameForm] = useState(false);
     const [showEditForm, setShowEditForm] = useState(false);
@@ -96,20 +97,22 @@ export function TournamentDetails({
                             <h2>{tournament.title}</h2>
                             <p>{tournament.description}</p>
                         </div>
-                        <div className="tournament-actions">
-                            <button
-                                className="btn btn-primary"
-                                onClick={() => setShowEditForm(true)}
-                            >
-                                Redigera
-                            </button>
-                            <button
-                                className="btn btn-danger"
-                                onClick={handleTournamentDelete}
-                            >
-                                Ta bort
-                            </button>
-                        </div>
+                        {!isGuest && (
+                            <div className="tournament-actions">
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => setShowEditForm(true)}
+                                >
+                                    Redigera
+                                </button>
+                                <button
+                                    className="btn btn-danger"
+                                    onClick={handleTournamentDelete}
+                                >
+                                    Ta bort
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     <div className="tournament-meta">
@@ -130,12 +133,14 @@ export function TournamentDetails({
                     <section className="games-section">
                         <div className="games-header">
                             <h3>Spel i turneringen</h3>
-                            <button
-                                className="btn btn-primary btn-small"
-                                onClick={() => setShowGameForm(!showGameForm)}
-                            >
-                                + Lägg till spel
-                            </button>
+                            {!isGuest && (
+                                <button
+                                    className="btn btn-primary btn-small"
+                                    onClick={() => setShowGameForm(!showGameForm)}
+                                >
+                                    + Lägg till spel
+                                </button>
+                            )}
                         </div>
 
                         {showGameForm && (
@@ -152,6 +157,7 @@ export function TournamentDetails({
                             isLoading={gamesLoading}
                             onEdit={handleGameUpdate}
                             onDelete={handleGameDelete}
+                            isGuest={isGuest}
                         />
                     </section>
                 </>
